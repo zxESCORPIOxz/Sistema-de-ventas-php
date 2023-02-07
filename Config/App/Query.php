@@ -15,5 +15,13 @@
             $data = $resul->fetch(PDO::FETCH_ASSOC);
             return $data;
         }
+
+        public function selectAll(String $sql) {
+            $this->sql = $sql;
+            $resul = $this->con->prepare($this->sql);
+            $resul->execute();
+            $data = $resul->fetchAll(PDO::FETCH_ASSOC);
+            return $data;
+        }
     }
 ?>
