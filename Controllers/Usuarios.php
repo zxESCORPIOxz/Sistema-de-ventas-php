@@ -40,14 +40,17 @@
             for ($i=0; $i < count($data); $i++) { 
                 if($data[$i]['estado'] == 1){
                     $data[$i]['estado'] = '<span class="badge badge-success">Activo</span>';
+                    $data[$i]['acciones'] = '<div>
+                    <button class="btn btn-primary" type="button" onclick="btnEditaruser('.$data[$i]['id'].');"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-danger" type="button" onclick="btnEliminaruser('.$data[$i]['id'].');"><i class="fas fa-user-alt-slash"></i></button>
+                    </div>';
                 }else{
                     $data[$i]['estado'] = '<span class="badge badge-danger">Inactivo</span>';
+                    $data[$i]['acciones'] = '<div>
+                    <button class="btn btn-primary" type="button" onclick="btnEditaruser('.$data[$i]['id'].');"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-success" type="button" onclick="btnReingresaruser('.$data[$i]['id'].');"><i class="fas fa-user-check"></i></button>
+                    </div>';
                 }
-                $data[$i]['acciones'] = '<div>
-                <button class="btn btn-primary" type="button" onclick="btnEditaruser('.$data[$i]['id'].');"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-danger" type="button" onclick="btnEliminaruser('.$data[$i]['id'].');"><i class="fas fa-trash-alt"></i></button>
-                <button class="btn btn-success" type="button" onclick="btnReingresaruser('.$data[$i]['id'].');">Reingresar</button>
-                </div>';
             }
             echo json_encode($data, JSON_UNESCAPED_UNICODE);
             die();
