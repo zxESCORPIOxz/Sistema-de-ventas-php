@@ -2,7 +2,7 @@
     include "Views/Templates/header.php";
 ?>
 <ol class="breadcrumb mb-4">
-    <li class="breadcrumb-item active">Usuario</li>
+    <li class="breadcrumb-item active">Usuarios</li>
 </ol>
 <button class="btn btn-primary mb-2" type="button" onclick="frmusuario()">Nuevo <i class="fas fa-plus"></i></button>
 <table class="table table-light" id="tblusuarios">

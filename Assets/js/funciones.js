@@ -1,4 +1,4 @@
-let tblusuarios, tblclientes, tblcajas, tblcategorias, tblmedidas;
+let tblusuarios, tblclientes, tblcajas, tblcategorias, tblmedidas, tblproductos;
 document.addEventListener("DOMContentLoaded",function(){
     tblusuarios = $('#tblusuarios').DataTable( {
         ajax: {
@@ -104,43 +104,35 @@ document.addEventListener("DOMContentLoaded",function(){
             'data' : 'acciones'
         }]
     } );
+
+    // Tabla medidas
+
+    tblproductos = $('#tblproductos').DataTable( {
+        ajax: {
+            url: base_url + "Productos/listar",
+            dataSrc: ''
+        },
+        columns: [
+        {
+            'data' : 'id'
+        },{
+            'data' : 'imagen'
+        },{
+            'data' : 'codigo'
+        },{
+            'data' : 'descripcion'
+        },{
+            'data' : 'precio_venta'
+        },{
+            'data' : 'cantidad'
+        },{
+            'data' : 'estado'
+        },{
+            'data' : 'acciones'
+        }]
+    } );
 });
 
-function frmLogin(e) {
-    e.preventDefault();
-    const usuario = document.getElementById('usuario');
-    const clave = document.getElementById('clave');
-    if(usuario.value == ""){
-        usuario.classList.add("is-invalid");
-        usuario.focus();
-    }else if(clave.value == ""){
-        clave.classList.add("is-invalid");
-        clave.focus();
-    }else{
-        clave.classList.remove("is-invalid");
-        usuario.classList.remove("is-invalid");
-        
-        const url = base_url + "Usuarios/validar";
-        const frm = document.getElementById("frmLogin");
-        const http = new XMLHttpRequest();
-        http.open("POST", url, true);
-        http.send(new FormData(frm));
-        http.onreadystatechange = function(){
-            if(this.readyState == 4 && this.status == 200){
-                
-                const res = JSON.parse(this.responseText);
-                if(res == "OK"){
-                    window.location = base_url + "Usuarios";
-                }else{
-                    document.getElementById("alerta").classList.remove("d-none");
-                    document.getElementById("alerta").innerHTML = res;
-                    console.log("Usuario o contraseña incorrecta");
-                }
-            }
-        }
-    }
-    
-}
 function frmusuario(){
     document.getElementById("title").innerHTML = "Nuevo Usuario";
     document.getElementById("btnAccion").innerHTML = "Registrar";
@@ -982,3 +974,204 @@ function btnReingresarmedida(id){
 }
 
 // Fun medidas
+
+function frmProducto(){
+    document.getElementById("title").innerHTML = "Nuevo Producto";
+    document.getElementById("btnAccion").innerHTML = "Registrar";
+
+    document.getElementById('frmProducto').reset();
+
+    document.getElementById('id').value = "";
+    $("#nuevo_producto").modal("show");
+
+    deleteImg();
+}
+function registrarPro(e) {
+    e.preventDefault();
+    const codigo = document.getElementById('codigo');
+    const nombre = document.getElementById('nombre');
+    const precio_compra = document.getElementById('precio_compra');
+    const precio_venta = document.getElementById('precio_venta');
+    const id_medida = document.getElementById('medida');
+    const id_categoria = document.getElementById('categoria');
+    if(codigo.value == ""  || nombre.value == "" || precio_compra.value == "" || precio_venta.value == "" ){
+        Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: 'Todos los campos son obligatorios',
+            showConfirmButton: false,
+            timer: 3000
+          })
+    }else{
+        const url = base_url + "Productos/registrar";
+        const frm = document.getElementById("frmProducto");
+        const http = new XMLHttpRequest();
+        http.open("POST", url, true);
+        http.send(new FormData(frm));
+        http.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                const res = JSON.parse(this.responseText);
+                if(res == "si"){
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'Producto registradado con exito', 
+                        showConfirmButton: false,
+                        timer: 3000
+                      })
+                      frm.reset();
+                      $("#nuevo_producto").modal("hide");
+                      tblproductos.ajax.reload();
+                }else if(res == "modificado"){
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'Producto modificado con exito', 
+                        showConfirmButton: false,
+                        timer: 3000
+                      })
+                      frm.reset();
+                      $("#nuevo_producto").modal("hide");
+                      tblproductos.ajax.reload();
+                }else{
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'error',
+                        title: res,
+                        showConfirmButton: false,
+                        timer: 3000
+                      })
+                }
+            }
+        }
+    }
+    
+}
+function btnEditarPro(id){
+    document.getElementById("title").innerHTML = "Editar Producto";
+    document.getElementById("btnAccion").innerHTML = "Guardar cambios";
+
+    const url = base_url + "Productos/editar/" + id;
+    const http = new XMLHttpRequest();
+    http.open("GET", url, true);
+    http.send();
+    http.onreadystatechange = function(){
+        if(this.readyState == 4 && this.status == 200){
+            const res = JSON.parse(this.responseText);
+            
+            document.getElementById('id').value = res.id;
+            document.getElementById('codigo').value = res.codigo;
+            document.getElementById('nombre').value = res.descripcion;
+            document.getElementById('precio_compra').value = res.precio_compra;
+            document.getElementById('precio_venta').value = res.precio_venta;
+            document.getElementById('medida').value = res.id_medida;
+            document.getElementById('categoria').value = res.id_categoria;
+            document.getElementById('img-preview').src = base_url + 'Assets/img/' + res.foto;
+            document.getElementById("icon-cerrar").innerHTML = `
+            <button class="btn btn-danger" onclick="deleteImg()"><i class="fas fa-times"></i></button>
+            `;
+            document.getElementById("icon-image").classList.add("d-none");
+            document.getElementById("foto_actual").value = res.foto;
+            $("#nuevo_producto").modal("show");
+
+
+        }
+    }
+}
+function btnEliminarPro(id){
+    Swal.fire({
+        title: 'Estas seguro de eliminar?',
+        text: "El producto no se eliminara de forma permanente!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Si, estoy deacuerdo',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const url = base_url + "Productos/eliminar/" + id;
+            const http = new XMLHttpRequest();
+            http.open("GET", url, true);
+            http.send();
+            http.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+                    const res = JSON.parse(this.responseText);
+                    if (res == "ok"){
+                        Swal.fire(
+                            'Mensaje!',
+                            'Producto eliminado con exito',
+                            'success'
+                        )
+                        tblproductos.ajax.reload();
+                    }else{
+                        const res = JSON.parse(this.responseText);
+                        Swal.fire(
+                            'Mensaje!',
+                            res,
+                            'error'
+                        )
+                    }
+                }
+            }
+        }
+    })
+}
+function btnReingresarPro(id){
+    Swal.fire({
+        title: 'Estas seguro de reingresar?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Si, estoy deacuerdo',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const url = base_url + "Productos/reingresar/" + id;
+            const http = new XMLHttpRequest();
+            http.open("GET", url, true);
+            http.send();
+            http.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+                    const res = JSON.parse(this.responseText);
+                    if (res == "ok"){
+                        Swal.fire(
+                            'Mensaje!',
+                            'Producto reingresado con exito',
+                            'success'
+                        )
+                        tblproductos.ajax.reload();
+                    }else{
+                        Swal.fire(
+                            'Mensaje!',
+                            res,
+                            'error'
+                        )
+                    }
+                }
+            }
+        }
+    })
+}
+
+function preview(e){
+    const url = e.target.files[0];
+    const urltmp = URL.createObjectURL(url);
+    document.getElementById("img-preview").src = urltmp;
+    document.getElementById("icon-image").classList.add("d-none");
+    document.getElementById("icon-cerrar").innerHTML = `
+    <button class="btn btn-danger" onclick="deleteImg()"><i class="fas fa-times"></i></button>
+    ${url['name']}
+    `;
+}
+
+function deleteImg(){
+    document.getElementById("icon-cerrar").innerHTML = ``;
+    document.getElementById("icon-image").classList.remove("d-none");
+    document.getElementById("img-preview").src = '';
+    document.getElementById("imagen").value = '';
+    document.getElementById("foto_actual").value = '';
+}
+
+// Fun productos
