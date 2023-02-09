@@ -1,5 +1,5 @@
 <?php
-    class Clientes extends Controller{
+    class Cajas extends Controller{
         public function __construct(){
             session_start();
             if(empty($_SESSION['activo'])){
@@ -13,19 +13,19 @@
         }
 
         public function listar(){
-            $data = $this->model->getClientes();
+            $data = $this->model->getCajas();
             for ($i=0; $i < count($data); $i++) { 
                 if($data[$i]['estado'] == 1){
                     $data[$i]['estado'] = '<span class="badge badge-success">Activo</span>';
                     $data[$i]['acciones'] = '<div>
-                    <button class="btn btn-primary" type="button" onclick="btnEditarcli('.$data[$i]['id'].');"><i class="fas fa-edit"></i></button>
-                    <button class="btn btn-danger" type="button" onclick="btnEliminarcli('.$data[$i]['id'].');"><i class="fas fa-user-alt-slash"></i></button>
+                    <button class="btn btn-primary" type="button" onclick="btnEditarcaja('.$data[$i]['id'].');"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-danger" type="button" onclick="btnEliminarcaja('.$data[$i]['id'].');"><i class="fas fa-user-alt-slash"></i></button>
                     </div>';
                 }else{
                     $data[$i]['estado'] = '<span class="badge badge-danger">Inactivo</span>';
                     $data[$i]['acciones'] = '<div>
-                    <button class="btn btn-primary" type="button" onclick="btnEditarcli('.$data[$i]['id'].');"><i class="fas fa-edit"></i></button>
-                    <button class="btn btn-success" type="button" onclick="btnReingresarcli('.$data[$i]['id'].');"><i class="fas fa-user-check"></i></button>
+                    <button class="btn btn-primary" type="button" onclick="btnEditarcaja('.$data[$i]['id'].');"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-success" type="button" onclick="btnReingresarcaja('.$data[$i]['id'].');"><i class="fas fa-user-check"></i></button>
                     </div>';
                 }
                 
@@ -35,29 +35,26 @@
         }
 
         public function registrar() {
-            $dni = $_POST['dni'];
-            $nombre = $_POST['nombre'];
-            $direccion = $_POST['direccion'];
-            $telefono = $_POST['telefono'];
+            $caja = $_POST['caja'];
             $id = $_POST['id'];
-            if( empty($dni) || empty($nombre) || empty($telefono)  || empty($direccion)){
+            if( empty($caja) ){
                 $msj = "Todos los campos son obligatorios";
             }else{
                 if($id == ""){
-                    $data = $this->model->registrarCliente($dni, $nombre, $telefono, $direccion);
+                    $data = $this->model->registrarCaja($caja);
                     if($data == "ok"){
                         $msj = "si";
                     }else if($data == "existe"){
                         $msj = "El DNI ya existe";
                     }else{
-                        $msj = "Error al registrar el cliente";
+                        $msj = "Error al registrar la caja";
                     }
                 }else{
-                    $data = $this->model->modificarCliente($dni, $nombre, $telefono, $direccion, $id);
+                    $data = $this->model->modificarCaja($caja, $id);
                     if($data == "modificado"){
                         $msj = "modificado";
                     }else{
-                        $msj = "Error al modificar el cliente";
+                        $msj = "Error al modificar la caja";
                     }
                 }
             }
@@ -65,30 +62,29 @@
             die();
         }
         public function editar(int $id){
-            $data = $this->model->editarCli($id);
+            $data = $this->model->editarCaja($id);
             echo json_encode($data, JSON_UNESCAPED_UNICODE);
             die();
         }
         public function eliminar(int $id){
-            $data = $this->model->accionCliente(0, $id);
+            $data = $this->model->accionCaja(0, $id);
             if ($data == 1){
                 $msj = "ok";
             }else{
-                $msj = "Error no se pudo eliminar el Cliente"; 
+                $msj = "Error no se pudo eliminar la caja"; 
             }
             echo json_encode($msj, JSON_UNESCAPED_UNICODE);
             die();
         }
         public function reingresar(int $id){
-            $data = $this->model->accionCliente(1, $id);
+            $data = $this->model->accionCaja(1, $id);
             if ($data == 1){
                 $msj = "ok";
             }else{
-                $msj = "Error no se pudo reingresar el Cliente"; 
+                $msj = "Error no se pudo reingresar la caja"; 
             }
             echo json_encode($msj, JSON_UNESCAPED_UNICODE);
             die();
         }
     }
-    
 ?>
