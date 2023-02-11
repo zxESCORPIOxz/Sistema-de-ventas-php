@@ -68,6 +68,10 @@
                                 <div class="sb-nav-link-icon"><i class="fab fa-product-hunt text-primary"></i></div>
                                 Productos
                             </a>
+                            <a class="nav-link" href="<?php echo base_url; ?>Compras">
+                                <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart text-primary"></i></div>
+                                Compras
+                            </a>
                         </div>
                     </div>
                     <!--<div class="sb-sidenav-footer">

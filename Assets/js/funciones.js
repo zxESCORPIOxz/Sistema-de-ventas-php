@@ -330,7 +330,7 @@ function registrarCli(e) {
         Swal.fire({
             position: 'center',
             icon: 'error',
-            title: 'Todos los campos son obligatorios',
+            title: 'Todos los campos son obligatorios1',
             showConfirmButton: false,
             timer: 3000
           })
@@ -1175,3 +1175,218 @@ function deleteImg(){
 }
 
 // Fun productos
+
+function buscarCodigo(event) {
+    event.preventDefault();
+    if(event.which == 13){
+        const cod = document.getElementById("codigo").value;
+
+        const url = base_url + "Compras/buscarCodigo/" + cod;
+        const http = new XMLHttpRequest();
+        http.open("GET", url, true);
+        http.send();
+        http.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                const res = JSON.parse(this.responseText);
+                if (res) {
+                    document.getElementById("nombre").value = res.descripcion;
+                    document.getElementById("precio").value = res.precio_compra;
+                    document.getElementById("id").value = res.id;
+                    document.getElementById("cantidad").focus();
+                } else {
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'error',
+                        title: 'El producto no existe',
+                        showConfirmButton: false,
+                        timer: 2000
+                    })
+                    document.getElementById("codigo").value = '';
+                    document.getElementById("codigo").focus();
+                }
+            }
+        }
+    }
+}
+function calcularSubtotal(event){
+    event.preventDefault();
+    const cant = document.getElementById("cantidad").value;
+    const precio = document.getElementById("precio").value;
+    document.getElementById("sub_total").value = cant * precio;
+    if( event.which == 13){
+        if( cant > 0 ){
+            const url = base_url + "Compras/ingresar";
+            const frm = document.getElementById("frmcompra");
+            const http = new XMLHttpRequest();
+            http.open("POST", url, true);
+            http.send(new FormData(frm));
+            http.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+                    const res = JSON.parse(this.responseText);
+                    if(res == "ok"){
+                        frm.reset();
+                        cargardetalle();
+                    }
+                }
+            }
+        }
+    }
+}
+
+cargardetalle();
+
+function cargardetalle(){
+    const url = base_url + "Compras/listar";
+    const http = new XMLHttpRequest();
+    http.open("GET", url, true);
+    http.send();
+    http.onreadystatechange = function(){
+        if(this.readyState == 4 && this.status == 200){
+            const res = JSON.parse(this.responseText);
+            let html = '';
+            res['detalle'].forEach(row => {
+                html += `
+                <tr>
+                    <td>${row['id']}</td>
+                    <td>${row['codigo']}</td>
+                    <td>${row['descripcion']}</td>
+                    <td>${row['cantidad']}</td>
+                    <td>${row['precio']}</td>
+                    <td>${row['sub_total']}</td>
+                    <td>
+                        <button class="btn btn-danger" type="button" onclick="deleteDetalle(${row['id']})">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            });
+            document.getElementById("tbldetalle").innerHTML = html;
+            document.getElementById("total").value = res['total'].total;
+        }
+    }
+}
+
+function deleteDetalle(id){
+    const url = base_url + "Compras/delete/" + id;
+    const http = new XMLHttpRequest();
+    http.open("GET", url, true);
+    http.send();
+    http.onreadystatechange = function(){
+        if(this.readyState == 4 && this.status == 200){
+            const res = JSON.parse(this.responseText);
+            if (res == "ok"){
+                cargardetalle();
+            }else{
+                const res = JSON.parse(this.responseText);
+                Swal.fire(
+                    'Mensaje!',
+                    res,
+                    'error'
+                )
+            }
+        }
+    }
+}
+
+function frmclientevalidar(dni){
+    document.getElementById("title").innerHTML = "Nuevo Cliente";
+    document.getElementById("btnAccion").innerHTML = "Registrar";
+
+    document.getElementById('frmcliente').reset();
+
+    document.getElementById('dni').value = dni;
+
+    $("#nuevo_cliente").modal("show");
+    document.getElementById('id').value = "";
+}
+
+function validarCliente(e){
+    e.preventDefault();
+    const dni = document.getElementById("cliente").value;
+
+    const url = base_url + "Compras/verificarCliente/" + dni;
+    const http = new XMLHttpRequest();
+    http.open("GET", url, true);
+    http.send();
+    http.onreadystatechange = function(){
+        if(this.readyState == 4 && this.status == 200){
+            console.log(this.responseText);
+            const res = JSON.parse(this.responseText);
+            if (res == "ok") {
+                const res = JSON.parse(this.responseText);
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'El cliente ya esta registrado', 
+                    showConfirmButton: false,
+                    timer: 3000
+                  })
+                  document.getElementById("estadocliente").value = "activo";
+            } else if(res == "inactivo"){
+                const res = JSON.parse(this.responseText);
+                Swal.fire({
+                    position: 'center',
+                    icon: 'error',
+                    title: 'El cliente esta betado de la tienda', 
+                    showConfirmButton: false,
+                    timer: 3000
+                  })
+                  document.getElementById("estadocliente").value = "inactivo";
+            } else {
+                document.getElementById("estadocliente").value = "inactivo";
+                frmclientevalidar(dni);
+            }
+        }
+    }
+}
+
+function registrarCliente(e) {
+    e.preventDefault();
+    const dni = document.getElementById('dni');
+    const nombre = document.getElementById('nombre_cliente');
+    const telefono = document.getElementById('telefono');
+    const direccion = document.getElementById('direccion');
+    if(dni.value == ""  || nombre.value == "" || telefono.value == "" || direccion.value == ""){
+        Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: 'Todos los campos son obligatorios1',
+            showConfirmButton: false,
+            timer: 3000
+          })
+    }else{
+        const url = base_url + "Compras/registrar";
+        const frm = document.getElementById("frmcliente");
+        const http = new XMLHttpRequest();
+        http.open("POST", url, true);
+        http.send(new FormData(frm));
+        http.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                const res = JSON.parse(this.responseText);
+                if(res == "si"){
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'Cliente registradado con exito', 
+                        showConfirmButton: false,
+                        timer: 3000
+                      })
+                      frm.reset();
+                      $("#nuevo_cliente").modal("hide");
+                      document.getElementById("estadocliente").value = "activo";
+                }else{
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'error',
+                        title: res,
+                        showConfirmButton: false,
+                        timer: 3000
+                      })
+                }
+            }
+        }
+    }
+    
+}
+
+// fun compras
