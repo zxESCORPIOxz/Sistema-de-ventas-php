@@ -165,7 +165,8 @@
             INNER JOIN clientes
             ON clientes.id = compras.id_cliente
             INNER JOIN usuarios
-            ON usuarios.id = compras.id_usuario";
+            ON usuarios.id = compras.id_usuario
+            ORDER BY compras.id DESC";
             $data = $this->selectAll($sql);
             return $data;
         }

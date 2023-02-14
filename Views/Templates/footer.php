@@ -18,11 +18,7 @@
         <script src="<?php echo base_url; ?>Assets/js/jquery-3.6.3.min.js" crossorigin="anonymous"></script>
         <script src="<?php echo base_url; ?>Assets/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
         <script src="<?php echo base_url; ?>Assets/js/scripts.js"></script>
-        <!--<script src="<?php echo base_url; ?>Assets/js/Chart.min.js" crossorigin="anonymous"></script>
-        <script src="<?php echo base_url; ?>Assets/demo/chart-area-demo.js"></script>
-        <script src="<?php echo base_url; ?>Assets/demo/chart-bar-demo.js"></script>-->
-        <script src="<?php echo base_url; ?>Assets/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
-        <script src="<?php echo base_url; ?>Assets/js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>
+        <script src="<?php echo base_url; ?>Assets/DataTables/datatables.min.js" crossorigin="anonymous"></script>
         <script src="<?php echo base_url; ?>Assets/demo/datatables-demo.js"></script>
         <script>
             const base_url = "<?php echo base_url; ?>";

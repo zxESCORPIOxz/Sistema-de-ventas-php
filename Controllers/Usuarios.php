@@ -65,11 +65,11 @@
             $id = $_POST['id'];
             $hash = hash('sha256', $clave);
             if( empty($usuario) || empty($nombre) || empty($caja)){
-                $msj = "Todos los campos son obligatorios";
+                $msj = array('msj' => "Todos los campos son obligatorios", 'icono' => 'warning');
             }else{
                 if($id == ""){
                     if($clave != $confirmar){
-                        $msj = "Las contraseñas no coinciden";
+                        $msj = array('msj' => "Las contraseñas no coinciden", 'icono' => 'warning');
                     }else{
                         $data = $this->model->registrarUsuario($usuario, $nombre, $hash, $caja);
                         if($data == "ok"){
