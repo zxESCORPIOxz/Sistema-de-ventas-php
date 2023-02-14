@@ -21,6 +21,7 @@
                 if($data[$i]['estado'] == 1){
                     $data[$i]['estado'] = '<span class="badge badge-success">Activo</span>';
                     $data[$i]['acciones'] = '<div>
+                    <button class="btn btn-info" type="button" onclick="btnAgregarPro('.$data[$i]['id'].');"><i class="fas fa-plus-circle"></i></button>
                     <button class="btn btn-primary" type="button" onclick="btnEditarPro('.$data[$i]['id'].');"><i class="fas fa-edit"></i></button>
                     <button class="btn btn-danger" type="button" onclick="btnEliminarPro('.$data[$i]['id'].');"><i class="fas fa-user-alt-slash"></i></button>
                     </div>';
@@ -124,6 +125,21 @@
         public function salir(){
             session_destroy();
             header('Location: '.base_url);
+        }
+
+        public function agregarStock(){
+            $id = $_POST['id_agregar'];
+            $cantidad = $_POST['cantidad_agregar'];
+            
+            $data = $this->model->agregarStock($id, $cantidad);
+            
+            if ($data == "ok") {
+                $msj = "ok";
+            } else {
+                $msj = "Error al actualizar el stock";
+            }
+            echo json_encode($msj, JSON_UNESCAPED_UNICODE);
+            die();
         }
     }
     

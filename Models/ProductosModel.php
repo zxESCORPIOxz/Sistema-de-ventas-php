@@ -86,5 +86,19 @@
             $data = $this->save($sql, $datos);
             return $data;
         }
+
+        public function agregarStock(int $id,int $cantidad){
+            $this->id = $id;
+            $this->cantidad = $cantidad;
+            $sql = "UPDATE productos SET cantidad = cantidad + ? WHERE id = ?";
+            $datos = array($this->cantidad, $this->id);
+            $data = $this->save($sql, $datos);
+            if($data == 1){
+                $res = "ok";
+            }else{
+                $res = "error";
+            }
+            return $res;
+        }
     }
 ?>

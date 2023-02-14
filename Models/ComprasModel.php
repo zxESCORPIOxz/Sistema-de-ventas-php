@@ -33,7 +33,7 @@
         }
 
         public function getDetalle(int $id){
-            $sql = "SELECT detalle.*,  productos.descripcion,productos.codigo
+            $sql = "SELECT detalle.*,  productos.descripcion, productos.codigo
             FROM detalle 
             INNER JOIN productos
             ON detalle.id_producto = productos.id
@@ -113,6 +113,61 @@
                 $res = "existe";
             }
             return $res;
+        }
+
+        public function completarCompras(string $total, string $cliente, string $id_usario){
+            $sql = "CALL I_COMPRA(?, ?, ?)";
+            $datos = array($total, $cliente, $id_usario);
+            $data = $this->ejecutar($sql, $datos);
+            
+            return $data;
+        }
+
+        public function cancelarCompra(int $id){
+            $sql = "DELETE FROM detalle 
+            WHERE id_usuario = ?";
+            $datos = array($id);
+            $data = $this->save($sql, $datos);
+            if ($data == 1) {
+                $res = "ok";
+            } else {
+                $res = "error";
+            }
+            
+            return $res;
+        }
+
+        public function getEmpresa(){
+            $sql = "SELECT * FROM configuracion";
+            $data = $this->select($sql);
+            
+            return $data;
+        }
+
+        public function getDetalleCompra(int $id_compra){
+            
+            $sql = "SELECT compras.* , detalle_compras.* , productos.id AS id_d_productos , productos.descripcion , clientes.dni , clientes.nombre
+            FROM compras
+            INNER JOIN detalle_compras
+            ON compras.id = detalle_compras.id_compra
+            INNER JOIN productos
+            ON detalle_compras.id_producto = productos.id
+            INNER JOIN clientes
+            ON compras.id_cliente = clientes.id
+            WHERE compras.id =  $id_compra";
+            $data = $this->selectAll($sql);
+            
+            return $data;
+        }
+
+        public function gethistorialcompra(){
+            $sql = "SELECT compras.*, clientes.dni, clientes.nombre, usuarios.nombre AS nombre_usuario FROM compras
+            INNER JOIN clientes
+            ON clientes.id = compras.id_cliente
+            INNER JOIN usuarios
+            ON usuarios.id = compras.id_usuario";
+            $data = $this->selectAll($sql);
+            return $data;
         }
     }
 ?>

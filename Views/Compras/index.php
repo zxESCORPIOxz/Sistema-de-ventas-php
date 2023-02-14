@@ -62,13 +62,11 @@
 </table>
 <div class="row">
     <div class="col-md-4 ml-auto">
-        <form id="frmverificarcliente">
-            <div class="form-group">
-                <label for="cliente" class="font-weight-bold"><i id="labelcliente" class="d-none"></i> Cliente</label>
-                <input id="cliente" class="form-control" type="text" name="cliente" placeholder="Ingresar DNI del Cliente">
-                <button id="btnverificar" name="btnverificar" class="btn btn-primary mt-2 btn-block" type="button" onclick="validarCliente(event);" >Verificar Cliente</button>
-            </div>
-        </form>
+        <div class="form-group">
+            <label for="cliente" class="font-weight-bold"><i id="labelcliente" class="d-none"></i> Cliente</label>
+            <input id="cliente" class="form-control" type="text" name="cliente" placeholder="Ingresar DNI del Cliente">
+            <button id="btnverificar" name="btnverificar" class="btn btn-primary mt-2 btn-block" type="button" onclick="validarCliente(event);" >Verificar Cliente</button>
+        </div>
     </div>
     <div class="col-md-4 ml-auto">
         <div class="form-group">
@@ -76,10 +74,10 @@
             <input id="total" class="form-control" type="text" name="total" placeholder="Total" disabled>
             <div class="row">
                 <div class="col-md-6">
-                    <button class="btn btn-primary mt-2 btn-block" type="button">Registrar compra</button>
+                    <button class="btn btn-primary mt-2 btn-block" type="button" onclick="completarCompras(event);">Registrar compra</button>
                 </div>
                 <div class="col-md-6">
-                    <button class="btn btn-danger mt-2 btn-block" type="button">Cancelar compra</button>
+                    <button class="btn btn-danger mt-2 btn-block" type="button" onclick="cancelarCompra();">Cancelar compra</button>
                 </div>
             </div>
         </div>

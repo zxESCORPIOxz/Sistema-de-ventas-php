@@ -131,6 +131,35 @@ document.addEventListener("DOMContentLoaded",function(){
             'data' : 'acciones'
         }]
     } );
+
+    // Tabla productos
+
+    tblhistorialcompra = $('#tblhistorialcompra').DataTable( {
+        ajax: {
+            url: base_url + "Compras/listarHistorial",
+            dataSrc: ''
+        },
+        columns: [
+        {
+            'data' : 'id'
+        },{
+            'data' : 'dni'
+        },{
+            'data' : 'nombre'
+        },{
+            'data' : 'total'
+        },{
+            'data' : 'fecha'
+        },{
+            'data' : 'nombre_usuario'
+        },{
+            'data' : 'acciones'
+        }]
+    } );
+
+    // Tabla historial
+
+
 });
 
 function frmusuario(){
@@ -986,6 +1015,25 @@ function frmProducto(){
 
     deleteImg();
 }
+
+function btnAgregarPro(id){
+    const url = base_url + "Productos/editar/" + id;
+    const http = new XMLHttpRequest();
+    http.open("GET", url, true);
+    http.send();
+    http.onreadystatechange = function(){
+        if(this.readyState == 4 && this.status == 200){
+            const res = JSON.parse(this.responseText);
+            
+            document.getElementById('id_agregar').value = res.id;
+            document.getElementById('codigo_agregar').value = res.codigo;
+            document.getElementById('nombre_agregar').value = res.descripcion;
+            document.getElementById('cantidad_actual').value = res.cantidad;
+            $("#agregar_producto").modal("show");
+        }
+    }
+}
+
 function registrarPro(e) {
     e.preventDefault();
     const codigo = document.getElementById('codigo');
@@ -1047,6 +1095,7 @@ function registrarPro(e) {
     }
     
 }
+
 function btnEditarPro(id){
     document.getElementById("title").innerHTML = "Editar Producto";
     document.getElementById("btnAccion").innerHTML = "Guardar cambios";
@@ -1078,6 +1127,7 @@ function btnEditarPro(id){
         }
     }
 }
+
 function btnEliminarPro(id){
     Swal.fire({
         title: 'Estas seguro de eliminar?',
@@ -1117,6 +1167,7 @@ function btnEliminarPro(id){
         }
     })
 }
+
 function btnReingresarPro(id){
     Swal.fire({
         title: 'Estas seguro de reingresar?',
@@ -1174,6 +1225,50 @@ function deleteImg(){
     document.getElementById("foto_actual").value = '';
 }
 
+function agregarStockPro(e){
+    e.preventDefault();
+    const cantidad = document.getElementById('cantidad_agregar');
+    if(cantidad.value == "" ){
+        Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: 'Todos los campos son obligatorios',
+            showConfirmButton: false,
+            timer: 3000
+          })
+    }else{
+        const url = base_url + "Productos/agregarStock";
+        const frm = document.getElementById("frmProductoStock");
+        const http = new XMLHttpRequest();
+        http.open("POST", url, true);
+        http.send(new FormData(frm));
+        http.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                const res = JSON.parse(this.responseText);
+                if(res == "ok"){
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'Stock actualizado con exito', 
+                        showConfirmButton: false,
+                        timer: 3000
+                      })
+                      frm.reset();
+                      $("#agregar_producto").modal("hide");
+                      tblproductos.ajax.reload();
+                }else{
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'error',
+                        title: res,
+                        showConfirmButton: false,
+                        timer: 3000
+                      })
+                }
+            }
+        }
+    }
+}
 // Fun productos
 
 function buscarCodigo(event) {
@@ -1226,6 +1321,14 @@ function calcularSubtotal(event){
                     if(res == "ok"){
                         frm.reset();
                         cargardetalle();
+                        document.getElementById("codigo").focus();
+                    }else{
+                        const res = JSON.parse(this.responseText);
+                        Swal.fire(
+                            'Mensaje!',
+                            res,
+                            'error'
+                        )
                     }
                 }
             }
@@ -1300,7 +1403,7 @@ function frmclientevalidar(dni){
     document.getElementById('id').value = "";
 }
 
-function validarCliente(e){
+function validarCliente(e) {
     e.preventDefault();
     const dni = document.getElementById("cliente").value;
 
@@ -1310,7 +1413,6 @@ function validarCliente(e){
     http.send();
     http.onreadystatechange = function(){
         if(this.readyState == 4 && this.status == 200){
-            console.log(this.responseText);
             const res = JSON.parse(this.responseText);
             if (res == "ok") {
                 const res = JSON.parse(this.responseText);
@@ -1321,7 +1423,7 @@ function validarCliente(e){
                     showConfirmButton: false,
                     timer: 3000
                   })
-                  document.getElementById("estadocliente").value = "activo";
+                  document.getElementById("estadocliente").value =  document.getElementById("cliente").value;
             } else if(res == "inactivo"){
                 const res = JSON.parse(this.responseText);
                 Swal.fire({
@@ -1355,7 +1457,7 @@ function registrarCliente(e) {
             timer: 3000
           })
     }else{
-        const url = base_url + "Compras/registrar";
+        const url = base_url + "Compras/registrarCliente";
         const frm = document.getElementById("frmcliente");
         const http = new XMLHttpRequest();
         http.open("POST", url, true);
@@ -1367,13 +1469,13 @@ function registrarCliente(e) {
                     Swal.fire({
                         position: 'center',
                         icon: 'success',
-                        title: 'Cliente registradado con exito', 
+                        title: 'Cliente registrado con exito', 
                         showConfirmButton: false,
                         timer: 3000
-                      })
+                      })         
                       frm.reset();
-                      $("#nuevo_cliente").modal("hide");
-                      document.getElementById("estadocliente").value = "activo";
+                      $("#nuevo_cliente").modal("hide");          
+                      document.getElementById("estadocliente").value =  document.getElementById("cliente").value;
                 }else{
                     Swal.fire({
                         position: 'center',
@@ -1387,6 +1489,80 @@ function registrarCliente(e) {
         }
     }
     
+}
+
+function completarCompras(e) {
+    e.preventDefault();
+    const cliente = document.getElementById("estadocliente").value;
+    if (cliente != 'inactivo') {
+        const url = base_url + "Compras/completarCompras/" + cliente;
+        const http = new XMLHttpRequest();
+        http.open("POST", url, true);
+        http.send();
+        http.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                const res = JSON.parse(this.responseText);
+                if(res['msj']=='ok'){
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'Compra registrada con exito', 
+                        showConfirmButton: false,
+                        timer: 3000
+                      })
+                      cargardetalle(); 
+                      document.getElementById("estadocliente").value = 'inactivo';  
+                      document.getElementById("cliente").value = ''; 
+                      const ruta = base_url + 'Compras/generarPDF/' + res['id_compra'];
+                      window.open(ruta);
+                      setTimeout(() => {
+                        window.location.reload();
+                      }, 300
+                      );
+                }else{
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'error',
+                        title: res['msj'],
+                        showConfirmButton: false,
+                        timer: 3000
+                      })
+                }
+            }
+        }
+    } else {
+        Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: 'Ingrese el cliente primero',
+            showConfirmButton: false,
+            timer: 3000
+          })
+    }
+}
+
+function cancelarCompra(){
+    const url = base_url + "Compras/cancelarCompra";
+    const http = new XMLHttpRequest();
+    http.open("GET", url, true);
+    http.send();
+    http.onreadystatechange = function(){
+        if(this.readyState == 4 && this.status == 200){
+            const res = JSON.parse(this.responseText);
+            if (res == "ok"){
+                cargardetalle();
+                document.getElementById("estadocliente").value = 'inactivo';  
+                document.getElementById("cliente").value = ''; 
+            }else{
+                const res = JSON.parse(this.responseText);
+                Swal.fire(
+                    'Mensaje!',
+                    res,
+                    'error'
+                )
+            }
+        }
+    }
 }
 
 // fun compras

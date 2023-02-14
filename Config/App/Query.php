@@ -36,5 +36,27 @@
             }
             return $res;
         }
+
+        public function saveNoArray(string $sql){
+            $this->sql = $sql;
+            $insert = $this->con->prepare($this->sql);
+            $data = $insert->execute();
+            if($data){
+                $res = 1;
+            }else{
+                $res = 0;
+            }
+            return $res;
+        }
+
+        public function ejecutar(string $sql, array $datos){
+            $this->sql = $sql;
+            $this->datos = $datos;
+            $resul = $this->con->prepare($this->sql);
+            $resul->execute($this->datos);
+
+            $data = $resul->fetch(PDO::FETCH_ASSOC);
+            return $data;
+        }
     }
 ?>
