@@ -38,23 +38,23 @@
             $caja = $_POST['caja'];
             $id = $_POST['id'];
             if( empty($caja) ){
-                $msj = "Todos los campos son obligatorios";
+                $msj = array('msj' => "Todos los campos son obligatorios", 'icono' => 'warning');
             }else{
                 if($id == ""){
                     $data = $this->model->registrarCaja($caja);
                     if($data == "ok"){
-                        $msj = "si";
+                        $msj = array('msj' => "ok", 'icono' => 'success');
                     }else if($data == "existe"){
-                        $msj = "El DNI ya existe";
+                        $msj = array('msj' => "La caja ya esta registrado", 'icono' => 'warning');
                     }else{
-                        $msj = "Error al registrar la caja";
+                        $msj = array('msj' => "Error al registrar la caja", 'icono' => 'warning');
                     }
                 }else{
                     $data = $this->model->modificarCaja($caja, $id);
                     if($data == "modificado"){
-                        $msj = "modificado";
+                        $msj = array('msj' => "modificado", 'icono' => 'success');
                     }else{
-                        $msj = "Error al modificar la caja";
+                        $msj = array('msj' => "Error al modificar la caja", 'icono' => 'warning');
                     }
                 }
             }
@@ -69,9 +69,9 @@
         public function eliminar(int $id){
             $data = $this->model->accionCaja(0, $id);
             if ($data == 1){
-                $msj = "ok";
+                $msj = array('msj' => "ok", 'icono' => 'success');
             }else{
-                $msj = "Error no se pudo eliminar la caja"; 
+                $msj = array('msj' => "Error al eliminar la caja", 'icono' => 'warning');
             }
             echo json_encode($msj, JSON_UNESCAPED_UNICODE);
             die();
@@ -79,9 +79,9 @@
         public function reingresar(int $id){
             $data = $this->model->accionCaja(1, $id);
             if ($data == 1){
-                $msj = "ok";
+                $msj = array('msj' => "ok", 'icono' => 'success');
             }else{
-                $msj = "Error no se pudo reingresar la caja"; 
+                $msj = array('msj' => "Error al reingresar la caja", 'icono' => 'warning');
             }
             echo json_encode($msj, JSON_UNESCAPED_UNICODE);
             die();

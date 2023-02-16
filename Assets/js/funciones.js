@@ -1,4 +1,4 @@
-let tblusuarios, tblclientes, tblcajas, tblcategorias, tblmedidas, tblproductos;
+let tblusuarios, tblclientes, tblcajas, tblcategorias, tblmedidas, tblproductos, tblproveedores;
 document.addEventListener("DOMContentLoaded",function(){
     tblusuarios = $('#tblusuarios').DataTable( {
         ajax: {
@@ -164,7 +164,91 @@ document.addEventListener("DOMContentLoaded",function(){
         ]
     } );
 
-    // Tabla caja
+    // Tabla clientes
+
+    tblproveedores = $('#tblproveedores').DataTable( {
+        ajax: {
+            url: base_url + "Proveedores/listar",
+            dataSrc: ''
+        },
+        columns: [
+        {
+            'data' : 'id'
+        },{
+            'data' : 'ruc'
+        },{
+            'data' : 'nombre'
+        },{
+            'data' : 'telefono'
+        },{
+            'data' : 'direccion'
+        },{
+            'data' : 'estado'
+        },{
+            'data' : 'acciones'
+        }],
+        language: {
+            "url": "//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json"
+        },
+        dom:"<'row'<'col-sm-4'l><'col-sm-4 text-center'B><'col-sm-4'f>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+        buttons: [{
+                //Botón para Excel
+                extend: 'excelHtml5',
+                footer: true,
+                title: 'Archivo',
+                filename: 'Export_File',
+ 
+                //Aquí es donde generas el botón personalizado
+                text: '<span class="badge badge-success"><i class="fas fa-file-excel"></i></span>'
+            },
+            //Botón para PDF
+            {
+                extend: 'pdfHtml5',
+                download: 'open',
+                footer: true,
+                title: 'Reporte ',
+                filename: 'Reporte ',
+                text: '<span class="badge  badge-danger"><i class="fas fa-file-pdf"></i></span>',
+                exportOptions: {
+                    columns: [0, ':visible']
+                }
+            },
+            //Botón para copiar
+            {
+                extend: 'copyHtml5',
+                footer: true,
+                title: 'Reporte ',
+                filename: 'Reporte ',
+                text: '<span class="badge  badge-primary"><i class="fas fa-copy"></i></span>',
+                exportOptions: {
+                    columns: [0, ':visible']
+                }
+            },
+            //Botón para print
+            {
+                extend: 'print',
+                footer: true,
+                filename: 'Export_File_print',
+                text: '<span class="badge badge-light"><i class="fas fa-print"></i></span>'
+            },
+            //Botón para cvs
+            {
+                extend: 'csvHtml5',
+                footer: true,
+                filename: 'Export_File_csv',
+                text: '<span class="badge  badge-success"><i class="fas fa-file-csv"></i></span>'
+            },
+            {
+                extend: 'colvis',
+                text: '<span class="badge  badge-info"><i class="fas fa-columns"></i></span>',
+                postfixButtons: ['colvisRestore']
+            }
+        ]
+    } );
+
+    // Tabla clientes
 
     tblcajas = $('#tblcajas').DataTable( {
         ajax: {
@@ -242,7 +326,7 @@ document.addEventListener("DOMContentLoaded",function(){
         ]
     } );
 
-    // Tabla categorias
+    // Tabla cajas
 
     tblcategorias = $('#tblcategorias').DataTable( {
         ajax: {
@@ -320,7 +404,7 @@ document.addEventListener("DOMContentLoaded",function(){
         ]
     } );
 
-    // Tabla medidas
+    // Tabla categorias
 
     tblmedidas = $('#tblmedidas').DataTable( {
         ajax: {
@@ -497,7 +581,7 @@ document.addEventListener("DOMContentLoaded",function(){
         {
             'data' : 'id'
         },{
-            'data' : 'dni'
+            'data' : 'ruc'
         },{
             'data' : 'nombre'
         },{
@@ -594,13 +678,8 @@ function registrarUser(e) {
     const confirmar = document.getElementById('confirmar');
     const caja = document.getElementById('caja');
     if(usuario.value == ""  || nombre.value == ""){
-        Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Todos los campos son obligatorios',
-            showConfirmButton: false,
-            timer: 3000
-          })
+        mensajeEmergente('Todos los campos son obligatorios', 'warning');
+          mensajeEmergente('Todos los campos son obligatorios', 'warning');
     }else{
         clave.classList.remove("is-invalid");
         usuario.classList.remove("is-invalid");
@@ -613,36 +692,18 @@ function registrarUser(e) {
         http.onreadystatechange = function(){
             if(this.readyState == 4 && this.status == 200){
                 const res = JSON.parse(this.responseText);
-                if(res == "si"){
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'success',
-                        title: 'Usuario registradado con exito', 
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
-                      frm.reset();
-                      $("#nuevo_usuario").modal("hide");
-                      tblusuarios.ajax.reload();
-                }else if(res == "modificado"){
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'success',
-                        title: 'Usuario modificado con exito', 
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
-                      frm.reset();
-                      $("#nuevo_usuario").modal("hide");
-                      tblusuarios.ajax.reload();
+                if(res['msj'] == "ok"){
+                    mensajeEmergente('Usuario registrado con exito', res['icono']);
+                    frm.reset();
+                    $("#nuevo_usuario").modal("hide");
+                    tblusuarios.ajax.reload();
+                }else if(res['msj'] == "modificado"){
+                    mensajeEmergente('Usuario modificado con exito', res['icono']);
+                    frm.reset();
+                    $("#nuevo_usuario").modal("hide");
+                    tblusuarios.ajax.reload();
                 }else{
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'error',
-                        title: res,
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
+                    mensajeEmergente(res['msj'], res['icono']);
                 }
             }
         }
@@ -693,20 +754,11 @@ function btnEliminaruser(id){
             http.onreadystatechange = function(){
                 if(this.readyState == 4 && this.status == 200){
                     const res = JSON.parse(this.responseText);
-                    if (res == "ok"){
-                        Swal.fire(
-                            'Mensaje!',
-                            'Usuario eliminado con exito',
-                            'success'
-                        )
+                    if (res['msj'] == "ok"){
+                        mensajeEmergente('Usuario eliminado con exito', res['icono']);
                         tblusuarios.ajax.reload();
                     }else{
-                        const res = JSON.parse(this.responseText);
-                        Swal.fire(
-                            'Mensaje!',
-                            res,
-                            'error'
-                        )
+                        mensajeEmergente(res['msj'], res['icono']);
                     }
                 }
             }
@@ -731,19 +783,11 @@ function btnReingresaruser(id){
             http.onreadystatechange = function(){
                 if(this.readyState == 4 && this.status == 200){
                     const res = JSON.parse(this.responseText);
-                    if (res == "ok"){
-                        Swal.fire(
-                            'Mensaje!',
-                            'Usuario reingresado con exito',
-                            'success'
-                        )
+                    if (res['msj'] == "ok"){
+                        mensajeEmergente('Usuario reingresado con exito', res['icono']);
                         tblusuarios.ajax.reload();
                     }else{
-                        Swal.fire(
-                            'Mensaje!',
-                            res,
-                            'error'
-                        )
+                        mensajeEmergente(res['msj'], res['icono']);
                     }
                 }
             }
@@ -769,13 +813,7 @@ function registrarCli(e) {
     const telefono = document.getElementById('telefono');
     const direccion = document.getElementById('direccion');
     if(dni.value == ""  || nombre.value == "" || telefono.value == "" || direccion.value == ""){
-        Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Todos los campos son obligatorios1',
-            showConfirmButton: false,
-            timer: 3000
-          })
+        mensajeEmergente('Todos los campos son obligatorios', 'warning');
     }else{
         const url = base_url + "Clientes/registrar";
         const frm = document.getElementById("frmcliente");
@@ -785,36 +823,18 @@ function registrarCli(e) {
         http.onreadystatechange = function(){
             if(this.readyState == 4 && this.status == 200){
                 const res = JSON.parse(this.responseText);
-                if(res == "si"){
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'success',
-                        title: 'Cliente registradado con exito', 
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
-                      frm.reset();
-                      $("#nuevo_cliente").modal("hide");
-                      tblclientes.ajax.reload();
-                }else if(res == "modificado"){
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'success',
-                        title: 'Cliente modificado con exito', 
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
-                      frm.reset();
-                      $("#nuevo_cliente").modal("hide");
-                      tblclientes.ajax.reload();
+                if(res['msj'] == "ok"){
+                    mensajeEmergente('Cliente registrado con exito', res['icono']);
+                    frm.reset();
+                    $("#nuevo_cliente").modal("hide");
+                    tblclientes.ajax.reload();
+                }else if(res['msj'] == "modificado"){
+                    mensajeEmergente('Cliente modificado con exito', res['icono']);
+                    frm.reset();
+                    $("#nuevo_cliente").modal("hide");
+                    tblclientes.ajax.reload();
                 }else{
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'error',
-                        title: res,
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
+                    mensajeEmergente(res['msj'], res['icono']);
                 }
             }
         }
@@ -864,20 +884,12 @@ function btnEliminarcli(id){
             http.onreadystatechange = function(){
                 if(this.readyState == 4 && this.status == 200){
                     const res = JSON.parse(this.responseText);
-                    if (res == "ok"){
-                        Swal.fire(
-                            'Mensaje!',
-                            'Cliente eliminado con exito',
-                            'success'
-                        )
+                    
+                    if (res['msj'] == "ok"){
+                        mensajeEmergente('Cliente eliminado con exito', res['icono']);
                         tblclientes.ajax.reload();
                     }else{
-                        const res = JSON.parse(this.responseText);
-                        Swal.fire(
-                            'Mensaje!',
-                            res,
-                            'error'
-                        )
+                        mensajeEmergente(res['msj'], res['icono']);
                     }
                 }
             }
@@ -902,19 +914,12 @@ function btnReingresarcli(id){
             http.onreadystatechange = function(){
                 if(this.readyState == 4 && this.status == 200){
                     const res = JSON.parse(this.responseText);
-                    if (res == "ok"){
-                        Swal.fire(
-                            'Mensaje!',
-                            'Cliente reingresado con exito',
-                            'success'
-                        )
+                    
+                    if (res['msj'] == "ok"){
+                        mensajeEmergente('Cliente reingresado con exito', res['icono']);
                         tblclientes.ajax.reload();
                     }else{
-                        Swal.fire(
-                            'Mensaje!',
-                            res,
-                            'error'
-                        )
+                        mensajeEmergente(res['msj'], res['icono']);
                     }
                 }
             }
@@ -923,6 +928,136 @@ function btnReingresarcli(id){
 }
 
 // Fun cliente
+
+function frmproveedor(){
+    document.getElementById("title").innerHTML = "Nuevo proveedor";
+    document.getElementById("btnAccion").innerHTML = "Registrar";
+
+    document.getElementById('frmproveedor').reset();
+
+    $("#nuevo_proveedor").modal("show");
+    document.getElementById('id').value = "";
+}
+function registrarProveedor(e) {
+    e.preventDefault();
+    const ruc = document.getElementById('ruc');
+    const nombre = document.getElementById('nombre');
+    const telefono = document.getElementById('telefono');
+    const direccion = document.getElementById('direccion');
+    if(ruc.value == ""  || nombre.value == "" || telefono.value == "" || direccion.value == ""){
+        mensajeEmergente('Todos los campos son obligatorios', 'warning');
+    }else{
+        const url = base_url + "Proveedores/registrar";
+        const frm = document.getElementById("frmproveedor");
+        const http = new XMLHttpRequest();
+        http.open("POST", url, true);
+        http.send(new FormData(frm));
+        http.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                const res = JSON.parse(this.responseText);
+                if(res['msj'] == "ok"){
+                    mensajeEmergente('Proveedor registrado con exito', res['icono']);
+                    frm.reset();
+                    $("#nuevo_proveedor").modal("hide");
+                    tblproveedores.ajax.reload();
+                }else if(res['msj'] == "modificado"){
+                    mensajeEmergente('Proveedor modificado con exito', res['icono']);
+                    frm.reset();
+                    $("#nuevo_proveedor").modal("hide");
+                    tblproveedores.ajax.reload();
+                }else{
+                    mensajeEmergente(res['msj'], res['icono']);
+                }
+            }
+        }
+    }
+    
+}
+function btnEditarProveedor(id){
+    document.getElementById("title").innerHTML = "Actualizar proveedor";
+    document.getElementById("btnAccion").innerHTML = "Guardar cambios";
+
+    const url = base_url + "Proveedores/editar/" + id;
+    const http = new XMLHttpRequest();
+    http.open("GET", url, true);
+    http.send();
+    http.onreadystatechange = function(){
+        if(this.readyState == 4 && this.status == 200){
+            const res = JSON.parse(this.responseText);
+            
+            document.getElementById('id').value = res.id;
+            document.getElementById('ruc').value = res.ruc;
+            document.getElementById('nombre').value = res.nombre;
+            document.getElementById('telefono').value = res.telefono;
+            document.getElementById('direccion').value = res.direccion;
+    
+            $("#nuevo_proveedor").modal("show");
+
+
+        }
+    }
+}
+function btnEliminarProveedor(id){
+    Swal.fire({
+        title: 'Estas seguro de eliminar?',
+        text: "El proveedor no se eliminara de forma permanente!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Si, estoy deacuerdo',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const url = base_url + "Proveedores/eliminar/" + id;
+            const http = new XMLHttpRequest();
+            http.open("GET", url, true);
+            http.send();
+            http.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+                    const res = JSON.parse(this.responseText);
+                    if (res['msj'] == "ok"){
+                        mensajeEmergente('Proveedor eliminado con exito', res['icono']);
+                        tblproveedores.ajax.reload();
+                    }else{
+                        mensajeEmergente(res['msj'], res['icono']);
+                    }
+                }
+            }
+        }
+    })
+}
+function btnReingresarProveedor(id){
+    Swal.fire({
+        title: 'Estas seguro de reingresar?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Si, estoy deacuerdo',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const url = base_url + "Proveedores/reingresar/" + id;
+            const http = new XMLHttpRequest();
+            http.open("GET", url, true);
+            http.send();
+            http.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+                    const res = JSON.parse(this.responseText);
+                    if (res['msj'] == "ok"){
+                        mensajeEmergente('Proveedor reingresado con exito', res['icono']);
+                        tblproveedores.ajax.reload();
+                    }else{
+                        mensajeEmergente(res['msj'], res['icono']);
+                    }
+                }
+            }
+        }
+    })
+}
+
+// Fun proveedor
 
 function frmcaja(){
     document.getElementById("title").innerHTML = "Nueva caja";
@@ -937,13 +1072,7 @@ function registrarCaja(e) {
     e.preventDefault();
     const nombre = document.getElementById('caja');
     if( nombre.value == "" ){
-        Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Todos los campos son obligatorios',
-            showConfirmButton: false,
-            timer: 3000
-          })
+        mensajeEmergente('Todos los campos son obligatorios', 'warning');
     }else{
         const url = base_url + "Cajas/registrar";
         const frm = document.getElementById("frmcaja");
@@ -953,36 +1082,19 @@ function registrarCaja(e) {
         http.onreadystatechange = function(){
             if(this.readyState == 4 && this.status == 200){
                 const res = JSON.parse(this.responseText);
-                if(res == "si"){
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'success',
-                        title: 'Caja registrada con exito', 
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
-                      frm.reset();
-                      $("#nuevo_caja").modal("hide");
-                      tblcajas.ajax.reload();
-                }else if(res == "modificado"){
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'success',
-                        title: 'Caja modificada con exito', 
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
-                      frm.reset();
-                      $("#nuevo_caja").modal("hide");
-                      tblcajas.ajax.reload();
+                if(res['msj'] == "ok"){
+                    mensajeEmergente('Caja registrada con exito', res['icono']);
+                    frm.reset();
+                    $("#nuevo_caja").modal("hide");
+                    tblcajas.ajax.reload();
+                }else if(res['msj'] == "modificado"){
+                    mensajeEmergente('Caja modifico con exito', res['icono']);
+                    frm.reset();
+                    $("#nuevo_caja").modal("hide");
+                    tblcajas.ajax.reload();
                 }else{
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'error',
-                        title: res,
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
+                    
+                    mensajeEmergente(res['msj'], res['icono']);
                 }
             }
         }
@@ -1029,20 +1141,11 @@ function btnEliminarcaja(id){
             http.onreadystatechange = function(){
                 if(this.readyState == 4 && this.status == 200){
                     const res = JSON.parse(this.responseText);
-                    if (res == "ok"){
-                        Swal.fire(
-                            'Mensaje!',
-                            'Caja eliminada con exito',
-                            'success'
-                        )
+                    if (res['msj'] == "ok"){
+                        mensajeEmergente('Caja eliminada con exito', res['icono']);
                         tblcajas.ajax.reload();
                     }else{
-                        const res = JSON.parse(this.responseText);
-                        Swal.fire(
-                            'Mensaje!',
-                            res,
-                            'error'
-                        )
+                        mensajeEmergente(res['msj'], res['icono']);
                     }
                 }
             }
@@ -1067,19 +1170,11 @@ function btnReingresarcaja(id){
             http.onreadystatechange = function(){
                 if(this.readyState == 4 && this.status == 200){
                     const res = JSON.parse(this.responseText);
-                    if (res == "ok"){
-                        Swal.fire(
-                            'Mensaje!',
-                            'Caja reingresada con exito',
-                            'success'
-                        )
+                    if (res['msj'] == "ok"){
+                        mensajeEmergente('Caja reingresada con exito', res['icono']);
                         tblcajas.ajax.reload();
                     }else{
-                        Swal.fire(
-                            'Mensaje!',
-                            res,
-                            'error'
-                        )
+                        mensajeEmergente(res['msj'], res['icono']);
                     }
                 }
             }
@@ -1102,13 +1197,7 @@ function registrarCategoria(e) {
     e.preventDefault();
     const nombre = document.getElementById('nombre');
     if( nombre.value == "" ){
-        Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Todos los campos son obligatorios',
-            showConfirmButton: false,
-            timer: 3000
-          })
+        mensajeEmergente('Todos los campos son obligatorios', 'warning');
     }else{
         const url = base_url + "Categorias/registrar";
         const frm = document.getElementById("frmcategoria");
@@ -1118,36 +1207,19 @@ function registrarCategoria(e) {
         http.onreadystatechange = function(){
             if(this.readyState == 4 && this.status == 200){
                 const res = JSON.parse(this.responseText);
-                if(res == "si"){
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'success',
-                        title: 'Categoria registrada con exito', 
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
-                      frm.reset();
-                      $("#nuevo_categoria").modal("hide");
-                      tblcategorias.ajax.reload();
-                }else if(res == "modificado"){
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'success',
-                        title: 'Categoria modificada con exito', 
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
-                      frm.reset();
-                      $("#nuevo_categoria").modal("hide");
-                      tblcategorias.ajax.reload();
+                if(res['msj'] == "ok"){
+                    mensajeEmergente('Categoria registrada con exito', res['icono']);
+                    frm.reset();
+                    $("#nuevo_categoria").modal("hide");
+                    tblcategorias.ajax.reload();
+                }else if(res['msj'] == "modificado"){
+                    mensajeEmergente('Categoria modificada con exito', res['icono']);
+                    frm.reset();
+                    $("#nuevo_categoria").modal("hide");
+                    tblcategorias.ajax.reload();
                 }else{
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'error',
-                        title: res,
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
+                    
+                    mensajeEmergente(res['msj'], res['icono']);
                 }
             }
         }
@@ -1192,20 +1264,11 @@ function btnEliminarcategoria(id){
             http.onreadystatechange = function(){
                 if(this.readyState == 4 && this.status == 200){
                     const res = JSON.parse(this.responseText);
-                    if (res == "ok"){
-                        Swal.fire(
-                            'Mensaje!',
-                            'Caja eliminada con exito',
-                            'success'
-                        )
+                    if (res['msj'] == "ok"){
+                        mensajeEmergente('Categoria eliminada con exito', res['icono']);
                         tblcategorias.ajax.reload();
                     }else{
-                        const res = JSON.parse(this.responseText);
-                        Swal.fire(
-                            'Mensaje!',
-                            res,
-                            'error'
-                        )
+                        mensajeEmergente(res['msj'], res['icono']);
                     }
                 }
             }
@@ -1230,19 +1293,11 @@ function btnReingresarcategoria(id){
             http.onreadystatechange = function(){
                 if(this.readyState == 4 && this.status == 200){
                     const res = JSON.parse(this.responseText);
-                    if (res == "ok"){
-                        Swal.fire(
-                            'Mensaje!',
-                            'Caja reingresada con exito',
-                            'success'
-                        )
+                    if (res['msj'] == "ok"){
+                        mensajeEmergente('Categoria reingresada con exito', res['icono']);
                         tblcategorias.ajax.reload();
                     }else{
-                        Swal.fire(
-                            'Mensaje!',
-                            res,
-                            'error'
-                        )
+                        mensajeEmergente(res['msj'], res['icono']);
                     }
                 }
             }
@@ -1266,13 +1321,7 @@ function registrarMedida(e) {
     const nombre = document.getElementById('nombre');
     const nombre_corto = document.getElementById('nombre_corto');
     if( nombre.value == "" ){
-        Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Todos los campos son obligatorios',
-            showConfirmButton: false,
-            timer: 3000
-          })
+        mensajeEmergente('Todos los campos son obligatorios', 'warning');
     }else{
         const url = base_url + "Medidas/registrar";
         const frm = document.getElementById("frmmedida");
@@ -1282,36 +1331,19 @@ function registrarMedida(e) {
         http.onreadystatechange = function(){
             if(this.readyState == 4 && this.status == 200){
                 const res = JSON.parse(this.responseText);
-                if(res == "si"){
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'success',
-                        title: 'Medida registrada con exito', 
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
+                if(res['msj'] == "ok"){
+                    mensajeEmergente('Medida registrada con exito', res['icono']);
                       frm.reset();
                       $("#nuevo_medida").modal("hide");
                       tblmedidas.ajax.reload();
-                }else if(res == "modificado"){
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'success',
-                        title: 'Categoria modificada con exito', 
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
+                }else if(res['msj'] == "modificado"){
+                    mensajeEmergente('Medida modificada con exito', res['icono']);
                       frm.reset();
                       $("#nuevo_medida").modal("hide");
                       tblmedidas.ajax.reload();
                 }else{
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'error',
-                        title: res,
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
+                    
+                    mensajeEmergente(res['msj'], res['icono']);
                 }
             }
         }
@@ -1357,20 +1389,11 @@ function btnEliminarmedida(id){
             http.onreadystatechange = function(){
                 if(this.readyState == 4 && this.status == 200){
                     const res = JSON.parse(this.responseText);
-                    if (res == "ok"){
-                        Swal.fire(
-                            'Mensaje!',
-                            'Caja eliminada con exito',
-                            'success'
-                        )
+                    if (res['msj'] == "ok"){
+                        mensajeEmergente('Medida eliminada con exito', res['icono']);
                         tblmedidas.ajax.reload();
                     }else{
-                        const res = JSON.parse(this.responseText);
-                        Swal.fire(
-                            'Mensaje!',
-                            res,
-                            'error'
-                        )
+                        mensajeEmergente(res['msj'], res['icono']);
                     }
                 }
             }
@@ -1395,19 +1418,11 @@ function btnReingresarmedida(id){
             http.onreadystatechange = function(){
                 if(this.readyState == 4 && this.status == 200){
                     const res = JSON.parse(this.responseText);
-                    if (res == "ok"){
-                        Swal.fire(
-                            'Mensaje!',
-                            'Medida reingresada con exito',
-                            'success'
-                        )
+                    if (res['msj'] == "ok"){
+                        mensajeEmergente('Medida reingresada con exito', res['icono']);
                         tblmedidas.ajax.reload();
                     }else{
-                        Swal.fire(
-                            'Mensaje!',
-                            res,
-                            'error'
-                        )
+                        mensajeEmergente(res['msj'], res['icono']);
                     }
                 }
             }
@@ -1456,13 +1471,7 @@ function registrarPro(e) {
     const id_medida = document.getElementById('medida');
     const id_categoria = document.getElementById('categoria');
     if(codigo.value == ""  || nombre.value == "" || precio_compra.value == "" || precio_venta.value == "" ){
-        Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Todos los campos son obligatorios',
-            showConfirmButton: false,
-            timer: 3000
-          })
+        mensajeEmergente('Todos los campos son obligatorios', 'warning');
     }else{
         const url = base_url + "Productos/registrar";
         const frm = document.getElementById("frmProducto");
@@ -1472,36 +1481,19 @@ function registrarPro(e) {
         http.onreadystatechange = function(){
             if(this.readyState == 4 && this.status == 200){
                 const res = JSON.parse(this.responseText);
-                if(res == "si"){
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'success',
-                        title: 'Producto registradado con exito', 
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
-                      frm.reset();
-                      $("#nuevo_producto").modal("hide");
-                      tblproductos.ajax.reload();
-                }else if(res == "modificado"){
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'success',
-                        title: 'Producto modificado con exito', 
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
-                      frm.reset();
-                      $("#nuevo_producto").modal("hide");
-                      tblproductos.ajax.reload();
+                if(res['msj'] == "ok"){
+                    mensajeEmergente('Producto registrado con exito', res['icono']);
+                    frm.reset();
+                    $("#nuevo_producto").modal("hide");
+                    tblproductos.ajax.reload();
+                }else if(res['msj'] == "modificado"){
+                    mensajeEmergente('Producto modificado con exito', res['icono']);
+                    frm.reset();
+                    $("#nuevo_producto").modal("hide");
+                    tblproductos.ajax.reload();
                 }else{
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'error',
-                        title: res,
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
+                    
+                    mensajeEmergente(res['msj'], res['icono']);
                 }
             }
         }
@@ -1560,20 +1552,11 @@ function btnEliminarPro(id){
             http.onreadystatechange = function(){
                 if(this.readyState == 4 && this.status == 200){
                     const res = JSON.parse(this.responseText);
-                    if (res == "ok"){
-                        Swal.fire(
-                            'Mensaje!',
-                            'Producto eliminado con exito',
-                            'success'
-                        )
+                    if (res['msj'] == "ok"){
+                        mensajeEmergente('Producto eliminado con exito', res['icono']);
                         tblproductos.ajax.reload();
                     }else{
-                        const res = JSON.parse(this.responseText);
-                        Swal.fire(
-                            'Mensaje!',
-                            res,
-                            'error'
-                        )
+                        mensajeEmergente(res['msj'], res['icono']);
                     }
                 }
             }
@@ -1599,19 +1582,11 @@ function btnReingresarPro(id){
             http.onreadystatechange = function(){
                 if(this.readyState == 4 && this.status == 200){
                     const res = JSON.parse(this.responseText);
-                    if (res == "ok"){
-                        Swal.fire(
-                            'Mensaje!',
-                            'Producto reingresado con exito',
-                            'success'
-                        )
+                    if (res['msj'] == "ok"){
+                        mensajeEmergente('Producto reingresado con exito', res['icono']);
                         tblproductos.ajax.reload();
                     }else{
-                        Swal.fire(
-                            'Mensaje!',
-                            res,
-                            'error'
-                        )
+                        mensajeEmergente(res['msj'], res['icono']);
                     }
                 }
             }
@@ -1642,13 +1617,7 @@ function agregarStockPro(e){
     e.preventDefault();
     const cantidad = document.getElementById('cantidad_agregar');
     if(cantidad.value == "" ){
-        Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Todos los campos son obligatorios',
-            showConfirmButton: false,
-            timer: 3000
-          })
+        mensajeEmergente('Todos los campos son obligatorios', 'warning');
     }else{
         const url = base_url + "Productos/agregarStock";
         const frm = document.getElementById("frmProductoStock");
@@ -1658,30 +1627,19 @@ function agregarStockPro(e){
         http.onreadystatechange = function(){
             if(this.readyState == 4 && this.status == 200){
                 const res = JSON.parse(this.responseText);
-                if(res == "ok"){
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'success',
-                        title: 'Stock actualizado con exito', 
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
-                      frm.reset();
-                      $("#agregar_producto").modal("hide");
-                      tblproductos.ajax.reload();
+                if(res['msj'] == "ok"){
+                    mensajeEmergente('Stock actualizado con exito', res['icono']);
+                    frm.reset();
+                    $("#agregar_producto").modal("hide");
+                    tblproductos.ajax.reload();
                 }else{
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'error',
-                        title: res,
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
+                    mensajeEmergente(res['msj'], res['icono']);
                 }
             }
         }
     }
 }
+
 // Fun productos
 
 if(document.getElementById('tbldetalle')){
@@ -1708,13 +1666,7 @@ function buscarCodigo(event) {
 
                     cargardetalle();
                 } else {
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'error',
-                        title: 'El producto no existe',
-                        showConfirmButton: false,
-                        timer: 2000
-                    })
+                    mensajeEmergente('El producto no existe', 'warning');
                     document.getElementById("codigo").value = '';
                     document.getElementById("codigo").focus();
 
@@ -1740,17 +1692,12 @@ function calcularSubtotal(event){
             http.onreadystatechange = function(){
                 if(this.readyState == 4 && this.status == 200){
                     const res = JSON.parse(this.responseText);
-                    if(res == "ok"){
+                    if(res['msj'] == "ok"){
                         frm.reset();
                         cargardetalle();
                         document.getElementById("codigo").focus();
                     }else{
-                        const res = JSON.parse(this.responseText);
-                        Swal.fire(
-                            'Mensaje!',
-                            res,
-                            'error'
-                        )
+                        mensajeEmergente(res['msj'], res['icono']);
                     }
 
                     cargardetalle();
@@ -1799,66 +1746,47 @@ function deleteDetalle(id){
     http.onreadystatechange = function(){
         if(this.readyState == 4 && this.status == 200){
             const res = JSON.parse(this.responseText);
-            if (res == "ok"){
+            if (res['msj'] == "ok"){
                 cargardetalle();
             }else{
-                const res = JSON.parse(this.responseText);
-                Swal.fire(
-                    'Mensaje!',
-                    res,
-                    'error'
-                )
+                mensajeEmergente(res['msj'], res['icono']);
             }
         }
     }
 }
 
-function frmclientevalidar(dni){
-    document.getElementById("title").innerHTML = "Nuevo Cliente";
+function frmproveedorvalidar(ruc){
+    document.getElementById("title").innerHTML = "Nuevo Proveedor";
     document.getElementById("btnAccion").innerHTML = "Registrar";
 
-    document.getElementById('frmcliente').reset();
+    document.getElementById('frmproveedor').reset();
 
-    document.getElementById('dni').value = dni;
+    document.getElementById('ruc').value = ruc;
 
-    $("#nuevo_cliente").modal("show");
+    $("#nuevo_proveedor").modal("show");
     document.getElementById('id').value = "";
 }
 
-function validarCliente(e) {
+function verificarProveedor(e) {
     e.preventDefault();
-    const dni = document.getElementById("cliente").value;
+    const ruc = document.getElementById("empresa").value;
 
-    const url = base_url + "Compras/verificarCliente/" + dni;
+    const url = base_url + "Compras/verificarProveedor/" + ruc;
     const http = new XMLHttpRequest();
     http.open("GET", url, true);
     http.send();
     http.onreadystatechange = function(){
         if(this.readyState == 4 && this.status == 200){
             const res = JSON.parse(this.responseText);
-            if (res == "ok") {
-                const res = JSON.parse(this.responseText);
-                Swal.fire({
-                    position: 'center',
-                    icon: 'success',
-                    title: 'El cliente ya esta registrado', 
-                    showConfirmButton: false,
-                    timer: 3000
-                  })
-                  document.getElementById("estadocliente").value =  document.getElementById("cliente").value;
+            if (res['msj'] == "ok") {
+                mensajeEmergente('El proveedor fue validado correctamente', res['icono']);
+                document.getElementById("estadoproveedor").value =  document.getElementById("empresa").value;
             } else if(res == "inactivo"){
-                const res = JSON.parse(this.responseText);
-                Swal.fire({
-                    position: 'center',
-                    icon: 'error',
-                    title: 'El cliente esta betado de la tienda', 
-                    showConfirmButton: false,
-                    timer: 3000
-                  })
-                  document.getElementById("estadocliente").value = "inactivo";
+                mensajeEmergente('El proveedor esta betado de la tienda', res['icono']);
+                document.getElementById("estadoproveedor").value = "inactivo";
             } else {
-                document.getElementById("estadocliente").value = "inactivo";
-                frmclientevalidar(dni);
+                document.getElementById("estadoproveedor").value = "inactivo";
+                frmproveedorvalidar(ruc);
             }
 
             cargardetalle();
@@ -1866,48 +1794,31 @@ function validarCliente(e) {
     }
 }
 
-function registrarCliente(e) {
+function registrarProveedorCompra(e) {
     e.preventDefault();
-    const dni = document.getElementById('dni');
-    const nombre = document.getElementById('nombre_cliente');
+    const ruc = document.getElementById('ruc');
+    const nombre = document.getElementById('nombre_proveedor');
     const telefono = document.getElementById('telefono');
     const direccion = document.getElementById('direccion');
-    if(dni.value == ""  || nombre.value == "" || telefono.value == "" || direccion.value == ""){
-        Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Todos los campos son obligatorios1',
-            showConfirmButton: false,
-            timer: 3000
-          })
+    if(ruc.value == ""  || nombre.value == "" || telefono.value == "" || direccion.value == ""){
+        mensajeEmergente('Todos los campos son obligatorios', 'warning');
     }else{
-        const url = base_url + "Compras/registrarCliente";
-        const frm = document.getElementById("frmcliente");
+        const url = base_url + "Compras/registrarProveedor";
+        const frm = document.getElementById("frmproveedor");
         const http = new XMLHttpRequest();
         http.open("POST", url, true);
         http.send(new FormData(frm));
         http.onreadystatechange = function(){
             if(this.readyState == 4 && this.status == 200){
                 const res = JSON.parse(this.responseText);
-                if(res == "si"){
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'success',
-                        title: 'Cliente registrado con exito', 
-                        showConfirmButton: false,
-                        timer: 3000
-                      })         
-                      frm.reset();
-                      $("#nuevo_cliente").modal("hide");          
-                      document.getElementById("estadocliente").value =  document.getElementById("cliente").value;
+                if(res['msj'] == "ok"){
+                    mensajeEmergente('Proveedor registrado con exito', res['icono']);
+                    frm.reset();
+                    $("#nuevo_proveedor").modal("hide");          
+                    document.getElementById("estadoproveedor").value =  document.getElementById("empresa").value;
                 }else{
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'error',
-                        title: res,
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
+                    
+                    mensajeEmergente(res['msj'], res['icono']);
                 }
             }
         }
@@ -1919,9 +1830,9 @@ function registrarCliente(e) {
 
 function completarCompras(e) {
     e.preventDefault();
-    const cliente = document.getElementById("estadocliente").value;
-    if (cliente != 'inactivo') {
-        const url = base_url + "Compras/completarCompras/" + cliente;
+    const empresa = document.getElementById("estadoproveedor").value;
+    if (empresa != 'inactivo') {
+        const url = base_url + "Compras/completarCompras/" + empresa;
         const http = new XMLHttpRequest();
         http.open("POST", url, true);
         http.send();
@@ -1929,41 +1840,23 @@ function completarCompras(e) {
             if(this.readyState == 4 && this.status == 200){
                 const res = JSON.parse(this.responseText);
                 if(res['msj']=='ok'){
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'success',
-                        title: 'Compra registrada con exito', 
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
-                      cargardetalle(); 
-                      document.getElementById("estadocliente").value = 'inactivo';  
-                      document.getElementById("cliente").value = ''; 
-                      const ruta = base_url + 'Compras/generarPDF/' + res['id_compra'];
-                      window.open(ruta);
-                      setTimeout(() => {
-                        window.location.reload();
-                      }, 300
-                      );
+                    mensajeEmergente('Compra registrada con exito', res['icono']);
+                    cargardetalle(); 
+                    document.getElementById("estadoproveedor").value = 'inactivo';  
+                    document.getElementById("empresa").value = ''; 
+                    const ruta = base_url + 'Compras/generarPDF/' + res['id_compra'];
+                    window.open(ruta);
+                    setTimeout(() => {
+                    window.location.reload();
+                    }, 300
+                    );
                 }else{
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'error',
-                        title: res['msj'],
-                        showConfirmButton: false,
-                        timer: 3000
-                      })
+                    mensajeEmergente(res['msj'], res['icono']);
                 }
             }
         }
     } else {
-        Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Ingrese el cliente primero',
-            showConfirmButton: false,
-            timer: 3000
-          })
+        mensajeEmergente('Ingrese el proveedor primero', 'warning');
     }
 
     cargardetalle();
@@ -1977,17 +1870,12 @@ function cancelarCompra(){
     http.onreadystatechange = function(){
         if(this.readyState == 4 && this.status == 200){
             const res = JSON.parse(this.responseText);
-            if (res == "ok"){
+            if (res['msj'] == "ok"){
                 cargardetalle();
-                document.getElementById("estadocliente").value = 'inactivo';  
-                document.getElementById("cliente").value = ''; 
+                document.getElementById("estadoproveedor").value = 'inactivo';  
+                document.getElementById("empresa").value = ''; 
             }else{
-                const res = JSON.parse(this.responseText);
-                Swal.fire(
-                    'Mensaje!',
-                    res,
-                    'error'
-                )
+                mensajeEmergente(res['msj'], res['icono']);
             }
         }
     }
@@ -2007,22 +1895,10 @@ function modificarEmpresa(){
         if(this.readyState == 4 && this.status == 200){
             console.log(this.responseText);
             const res = JSON.parse(this.responseText);
-            if(res == "modificado"){
-                Swal.fire({
-                    position: 'center',
-                    icon: 'success',
-                    title: 'Datos modificados con exito', 
-                    showConfirmButton: false,
-                    timer: 3000
-                  })
+            if(res['msj'] == "modificado"){
+                mensajeEmergente('Datos modificados con exito', res['icono']);
             }else{
-                Swal.fire({
-                    position: 'center',
-                    icon: 'error',
-                    title: res,
-                    showConfirmButton: false,
-                    timer: 3000
-                  })
+                mensajeEmergente(res['msj'], res['icono']);
             }
         }
     }

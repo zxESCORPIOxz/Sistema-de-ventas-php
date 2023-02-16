@@ -39,23 +39,23 @@
             $nombre_corto = $_POST['nombre_corto'];
             $id = $_POST['id'];
             if( empty($nombre_corto) || empty($nombre)){
-                $msj = "Todos los campos son obligatorios";
+                $msj = array('msj' => "Todos los campos son obligatorios", 'icono' => 'warning');
             }else{
                 if($id == ""){
                     $data = $this->model->registrarMedida($nombre, $nombre_corto);
                     if($data == "ok"){
-                        $msj = "si";
+                        $msj = array('msj' => "ok", 'icono' => 'success');
                     }else if($data == "existe"){
-                        $msj = "La medida ya existe";
+                        $msj = array('msj' => "La medida ya esta registrado", 'icono' => 'warning');
                     }else{
-                        $msj = "Error al registrar la medida";
+                        $msj = array('msj' => "Error al registrar la medida", 'icono' => 'warning');
                     }
                 }else{
                     $data = $this->model->modificarMedida($nombre, $nombre_corto, $id);
                     if($data == "modificado"){
-                        $msj = "modificado";
+                        $msj = array('msj' => "modificado", 'icono' => 'success');
                     }else{
-                        $msj = "Error al modificar el medida";
+                        $msj = array('msj' => "Error al modificar la medida", 'icono' => 'warning');
                     }
                 }
             }
@@ -70,9 +70,9 @@
         public function eliminar(int $id){
             $data = $this->model->accionMedida(0, $id);
             if ($data == 1){
-                $msj = "ok";
+                $msj = array('msj' => "ok", 'icono' => 'success');
             }else{
-                $msj = "Error no se pudo eliminar el Medida"; 
+                $msj = array('msj' => "Error al eliminar la medida", 'icono' => 'warning');
             }
             echo json_encode($msj, JSON_UNESCAPED_UNICODE);
             die();
@@ -80,9 +80,9 @@
         public function reingresar(int $id){
             $data = $this->model->accionMedida(1, $id);
             if ($data == 1){
-                $msj = "ok";
+                $msj = array('msj' => "ok", 'icono' => 'success');
             }else{
-                $msj = "Error no se pudo reingresar el Medida"; 
+                $msj = array('msj' => "Error al reingresar la medida", 'icono' => 'warning');
             }
             echo json_encode($msj, JSON_UNESCAPED_UNICODE);
             die();

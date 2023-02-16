@@ -5,7 +5,7 @@
     <div class="card-header bg-primary text-white">
         <h4>Nueva compra</h4>
     </div>
-    <input type="hidden" id="estadocliente" name="estadocliente" value="inactivo">
+    <input type="hidden" id="estadoproveedor" name="estadoproveedor" value="inactivo">
     <div class="card-body">
         <form id="frmcompra">
             <div class="row">
@@ -63,9 +63,9 @@
 <div class="row">
     <div class="col-md-4 ml-auto">
         <div class="form-group">
-            <label for="cliente" class="font-weight-bold"><i id="labelcliente" class="d-none"></i> Cliente</label>
-            <input id="cliente" class="form-control" type="text" name="cliente" placeholder="Ingresar DNI del Cliente">
-            <button id="btnverificar" name="btnverificar" class="btn btn-primary mt-2 btn-block" type="button" onclick="validarCliente(event);" >Verificar Cliente</button>
+            <label for="empresa" class="font-weight-bold"><i id="labelcliente" class="d-none"></i> Empresa</label>
+            <input id="empresa" class="form-control" type="text" name="empresa" placeholder="Ingresar el RUC de la empresa">
+            <button id="btnverificar" name="btnverificar" class="btn btn-primary mt-2 btn-block" type="button" onclick="verificarProveedor(event);" >Verificar Cliente</button>
         </div>
     </div>
     <div class="col-md-4 ml-auto">
@@ -84,27 +84,27 @@
     </div>
 </div>
 
-<div id="nuevo_cliente" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="my-modal-title" aria-hidden="true">
+<div id="nuevo_proveedor" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="my-modal-title" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header bg-primary">
-                <h5 class="modal-title text-white" id="title">Nuevo Cliente</h5>
+                <h5 class="modal-title text-white" id="title">Nuevo Proveedor</h5>
                 <button class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form method="post" id="frmcliente">
+                <form method="post" id="frmproveedor">
 
                     <input type="hidden" id="id" name="id"/>
 
                     <div class="form-group">
-                        <label for="dni">DNI</label>
-                        <input id="dni" class="form-control" type="text" name="dni" placeholder="Documento de identidad">
+                        <label for="ruc">RUC</label>
+                        <input id="ruc" class="form-control" type="text" name="ruc" placeholder="RUC de la empresa">
                     </div>
                     <div class="form-group">
-                        <label for="nombre_cliente">Nombre</label>
-                        <input id="nombre_cliente" class="form-control" type="text" name="nombre_cliente" placeholder="Nombre del cliente">
+                        <label for="nombre_proveedor">Empresa</label>
+                        <input id="nombre_proveedor" class="form-control" type="text" name="nombre_proveedor" placeholder="Nombre de la empresa">
                     </div>
                     <div class="form-group">
                         <label for="telefono">Telefono</label>
@@ -114,7 +114,7 @@
                         <label for="direccion">Dirección</label>
                         <textarea id="direccion" class="form-control" name="direccion"  placeholder="Dirección" rows="3"></textarea>
                     </div>
-                    <button class="btn btn-primary" type="button" onclick="registrarCliente(event);" id="btnAccion">Registrar</button>
+                    <button class="btn btn-primary" type="button" onclick="registrarProveedorCompra(event);" id="btnAccion">Registrar</button>
                     <button class="btn btn-danger" type="button" data-dismiss="modal">Cancelar</button>
                 </form>
             </div>

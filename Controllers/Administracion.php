@@ -30,9 +30,9 @@
             } else {
                 $data = $this->model->modificarEmpresa($id, $nombre, $ruc, $telefono, $direccion, $mensaje);
                 if($data == "modificado"){
-                    $res = "modificado";
+                    $res = array('msj' => "modificado", 'icono' => 'success');
                 }else{
-                    $res = "Error al modificar los datos de la empresa";
+                    $res = array('msj' => "Error al modificar los datos de la empresa", 'icono' => 'warning');
                 }
             }
             echo json_encode($res, JSON_UNESCAPED_UNICODE);

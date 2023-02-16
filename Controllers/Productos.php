@@ -54,7 +54,8 @@
             $fecha = date("YmdHis");
 
             if( empty($codigo) || empty($nombre) || empty($precio_compra) || empty($precio_venta) || empty($id_medida) ||  empty($id_categoria)){
-                $msj = "Todos los campos son obligatorios";
+                
+                $msj = array('msj' => "Todos los campos son obligatorios", 'icono' => 'warning');
             }else{
                 if(!empty($name)){
                     $imgNombre = $fecha . ".jpg";
@@ -70,11 +71,11 @@
                         if(!empty($name)){
                             move_uploaded_file($tmpname, $destino);
                         }
-                        $msj = "si";
+                        $msj = array('msj' => "ok", 'icono' => 'success');
                     }else if($data == "existe"){
-                        $msj = "El Producto ya existe";
+                        $msj = array('msj' => "El Producto ya esta registrado", 'icono' => 'warning');
                     }else{
-                        $msj = "Error al registrar el Producto";
+                        $msj = array('msj' => "Error al registrar el Producto", 'icono' => 'warning');
                     }
                 }else{
                     $imgDelete = $this->model->editarPro($id);
@@ -88,9 +89,9 @@
                             if(!empty($name)){
                                 move_uploaded_file($tmpname, $destino);
                             }
-                            $msj = "modificado";
+                            $msj = array('msj' => "modificado", 'icono' => 'success');
                         }else{
-                            $msj = "Error al modificar el Producto";
+                            $msj = array('msj' => "Error al modificar el Producto", 'icono' => 'warning');
                         }
                 }
             }
@@ -105,9 +106,9 @@
         public function eliminar(int $id){
             $data = $this->model->accionProducto(0, $id);
             if ($data == 1){
-                $msj = "ok";
+                $msj = array('msj' => "ok", 'icono' => 'success');
             }else{
-                $msj = "Error no se pudo eliminar el Producto"; 
+                $msj = array('msj' => "Error no se pudo eliminar el Producto", 'icono' => 'warning');
             }
             echo json_encode($msj, JSON_UNESCAPED_UNICODE);
             die();
@@ -115,9 +116,9 @@
         public function reingresar(int $id){
             $data = $this->model->accionProducto(1, $id);
             if ($data == 1){
-                $msj = "ok";
+                $msj = array('msj' => "ok", 'icono' => 'success');
             }else{
-                $msj = "Error no se pudo reingresar el Producto"; 
+                $msj = array('msj' => "Error no se pudo reingresar el Producto", 'icono' => 'warning');
             }
             echo json_encode($msj, JSON_UNESCAPED_UNICODE);
             die();
@@ -134,9 +135,9 @@
             $data = $this->model->agregarStock($id, $cantidad);
             
             if ($data == "ok") {
-                $msj = "ok";
+                $msj = array('msj' => "ok", 'icono' => 'success');
             } else {
-                $msj = "Error al actualizar el stock";
+                $msj = array('msj' => "Error no se pudo actualizar el stock del producto", 'icono' => 'warning');
             }
             echo json_encode($msj, JSON_UNESCAPED_UNICODE);
             die();

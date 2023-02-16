@@ -23,31 +23,21 @@
             $precio = $datos['precio_compra'];
             $cantidad = $_POST['cantidad'];
             $subtotal = $precio * $cantidad;
-            if ($cantidad > $datos['cantidad']) {
-                $data = "stock";
+            $validar = $this->model->validarProducto($id_producto, $id_usuario);
+            if (empty($validar)) {
+                $data = $this->model->registrarDetalle($id_producto, $id_usuario, $precio, $cantidad, $subtotal);
             } else {
-                $validar = $this->model->validarProducto($id_producto, $id_usuario);
-                if (empty($validar)) {
-                    $data = $this->model->registrarDetalle($id_producto, $id_usuario, $precio, $cantidad, $subtotal);
-                } else {
-                    $cantidad = $validar['cantidad'] + $cantidad;
-                    $subtotal = $precio * $cantidad;
-                    $id_detalle = $validar['id'];
-                    
-                    if ($cantidad > $datos['cantidad']) {
-                        $data = "stock";
-                    }else{
-                        $data = $this->model->modificarDetalle($cantidad, $subtotal, $id_detalle);
-                    }
-                }
+                $cantidad = $validar['cantidad'] + $cantidad;
+                $subtotal = $precio * $cantidad;
+                $id_detalle = $validar['id'];
+                $data = $this->model->modificarDetalle($cantidad, $subtotal, $id_detalle);
             }
-            
             if ($data == "ok") {
-                $msj = "ok";
+                $msj = array('msj' => "ok", 'icono' => 'success');
             } else if($data == "stock"){
-                $msj = "Error al ingresar el stock";
+                $msj = array('msj' => "Error al ingresar el stock", 'icono' => 'warning');
             }else{
-                $msj = "Error al ingresar el producto";
+                $msj = array('msj' => "Error al ingresar el producto", 'icono' => 'warning');
             }
             echo json_encode($msj, JSON_UNESCAPED_UNICODE);
             die();
@@ -64,20 +54,20 @@
         public function delete(int $id){
             $data = $this->model->deleteDetalle($id);
             if ($data == "ok") {
-                $msj = "ok";
+                $msj = array('msj' => "ok", 'icono' => 'success');
             } else {
-                $msj = "No se pudo eliminar el producto";
+                $msj = array('msj' => "No se pudo eliminar el producto", 'icono' => 'warning');
             }
             echo json_encode($msj, JSON_UNESCAPED_UNICODE);
             die();
         }
 
-        public function completarCompras($cliente){
+        public function completarCompras($proveedor){
             $id_usuario = $_SESSION['id_usuario'];
             $total = $this->model->calcularTotal($id_usuario);
-            $data = $this->model->completarCompras($total['total'], $cliente, $id_usuario);
+            $data = $this->model->completarCompras($total['total'], $proveedor, $id_usuario);
             if (is_numeric($data['id'])) {
-                $msj = array('msj' => 'ok', 'id_compra' => $data['id']);
+                $msj = array('msj' => 'ok', 'icono' => 'success', 'id_compra' => $data['id']);
             } else {
                 $msj = array('msj' => 'No se pudo registrar la compra');
             }
@@ -88,44 +78,44 @@
         public function cancelarCompra(){
             $data = $this->model->cancelarCompra($_SESSION['id_usuario']);
             if ($data == "ok") {
-                $msj = "ok";
+                $msj = array('msj' => "ok", 'icono' => 'success');
             } else {
-                $msj = "No se pudo cancelar la compra";
+                $msj = array('msj' => "No se pudo cancelar la compra", 'icono' => 'warning');
             }
             echo json_encode($msj, JSON_UNESCAPED_UNICODE);
             die();
         }
 
-        public function verificarCliente(string $dni){
-            $data = $this->model->verificarCliente($dni);
+        public function verificarProveedor(string $ruc){
+            $data = $this->model->verificarProveedor($ruc);
             if (!empty($data)) {
                 if($data['estado'] == 1){
-                    $msj = "ok";
+                    $msj = array('msj' => "ok", 'icono' => 'success');
                 }else{
-                    $msj = "inactivo";
+                    $msj = array('msj' => "inactivo", 'icono' => 'warning');
                 }
             } else {
-                $msj = "no";
+                $msj = array('msj' => "no", 'icono' => 'warning');
             }
             echo json_encode($msj, JSON_UNESCAPED_UNICODE);
             die();
         }
-        public function registrarCliente() {
-            $dni = $_POST['dni'];
-            $nombre = $_POST['nombre_cliente'];
+        public function registrarProveedor() {
+            $ruc = $_POST['ruc'];
+            $nombre = $_POST['nombre_proveedor'];
             $direccion = $_POST['direccion'];
             $telefono = $_POST['telefono'];
             $id = $_POST['id'];
-            if( empty($dni) || empty($nombre) || empty($telefono)  || empty($direccion)){
-                $msj = "Todos los campos son obligatorios";
+            if( empty($ruc) || empty($nombre) || empty($telefono)  || empty($direccion)){
+                $msj = array('msj' => "Todos los campos son obligatorios", 'icono' => 'warning');
             }else{
-                $data = $this->model->registrarCliente($dni, $nombre, $telefono, $direccion);
+                $data = $this->model->registrarProveedor($ruc, $nombre, $telefono, $direccion);
                 if($data == "ok"){
-                    $msj = "si";
+                    $msj = array('msj' => "ok", 'icono' => 'success');
                 }else if($data == "existe"){
-                    $msj = "El DNI ya existe";
+                    $msj = array('msj' => "El RUC ya esta registrado", 'icono' => 'warning');
                 }else{
-                    $msj = "Error al registrar el cliente";
+                    $msj = array('msj' => "Error al registrar el proveedor", 'icono' => 'warning');
                 }
             }
             echo json_encode($msj, JSON_UNESCAPED_UNICODE);
@@ -190,7 +180,7 @@
                 $pdf->Cell(12, 5, utf8_decode($row['precio']), 0, 0, 'R');
                 $pdf->Cell(15, 5, utf8_decode($row['sub_total']), 0, 1, 'R');
                 $total = $row['total'];
-                $dni = $row['dni'];
+                $ruc = $row['ruc'];
                 $nombre = $row['nombre'];
             }
 
@@ -204,17 +194,17 @@
             $pdf->Ln();
 
             $pdf->SetFont('Arial','B',10);
-            $pdf->Cell(60, 5, utf8_decode('Datos del cliente'), 0, 1, 'L');
+            $pdf->Cell(60, 5, utf8_decode('Datos del Proveedor'), 0, 1, 'L');
 
             $pdf->Ln();
 
             $pdf->SetFont('Arial','B',10);
-            $pdf->Cell(20, 5, utf8_decode('DNI : '), 0, 0, 'L');
+            $pdf->Cell(20, 5, utf8_decode('RUC : '), 0, 0, 'L');
             $pdf->SetFont('Arial','',10);
-            $pdf->Cell(15, 5, utf8_decode($dni), 0, 1, 'L');
+            $pdf->Cell(15, 5, utf8_decode($ruc), 0, 1, 'L');
 
             $pdf->SetFont('Arial','B',10);
-            $pdf->Cell(20, 5, utf8_decode('Nombre : '), 0, 0, 'L');
+            $pdf->Cell(20, 5, utf8_decode('Empresa : '), 0, 0, 'L');
             $pdf->SetFont('Arial','',10);
             $pdf->Cell(15, 5, utf8_decode($nombre), 0, 1, 'L');
 

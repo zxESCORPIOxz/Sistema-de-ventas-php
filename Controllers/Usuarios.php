@@ -73,19 +73,19 @@
                     }else{
                         $data = $this->model->registrarUsuario($usuario, $nombre, $hash, $caja);
                         if($data == "ok"){
-                            $msj = "si";
+                            $msj = array('msj' => "ok", 'icono' => 'success');
                         }else if($data == "existe"){
-                            $msj = "El usuario ya existe";
+                            $msj = array('msj' => "El usuario ya existe", 'icono' => 'warning');
                         }else{
-                            $msj = "Error al registrar el usuario";
+                            $msj = array('msj' => "Error al registrar el usuario", 'icono' => 'warning');
                         }
                     }
                 }else{
                     $data = $this->model->modificarUsuario($usuario, $nombre, $caja, $id);
                     if($data == "modificado"){
-                        $msj = "modificado";
+                        $msj = array('msj' => "modificado", 'icono' => 'success');
                     }else{
-                        $msj = "Error al modificar el usuario";
+                        $msj = array('msj' => "Error al modificar el usuario", 'icono' => 'warning');
                     }
                 }
             }
@@ -100,9 +100,9 @@
         public function eliminar(int $id){
             $data = $this->model->accionUsuario(0, $id);
             if ($data == 1){
-                $msj = "ok";
+                $msj = array('msj' => "ok", 'icono' => 'success');
             }else{
-                $msj = "Error no se pudo eliminar el usuario"; 
+                $msj = array('msj' => "Error no se pudo eliminar el usuario", 'icono' => 'warning');
             }
             echo json_encode($msj, JSON_UNESCAPED_UNICODE);
             die();
@@ -110,9 +110,9 @@
         public function reingresar(int $id){
             $data = $this->model->accionUsuario(1, $id);
             if ($data == 1){
-                $msj = "ok";
+                $msj = array('msj' => "ok", 'icono' => 'success');
             }else{
-                $msj = "Error no se pudo reingresar el usuario"; 
+                $msj = array('msj' => "Error no se pudo reingresar el usuario", 'icono' => 'warning');
             }
             echo json_encode($msj, JSON_UNESCAPED_UNICODE);
             die();

@@ -8,8 +8,8 @@
     <thead class="thead-dark">
         <tr>
             <th>Id</th>
-            <th>DNI</th>
-            <th>Nombre del cliente</th>
+            <th>RUC</th>
+            <th>Nombre de la empresa</th>
             <th>Total</th>
             <th>Fecha y hora</th>
             <th>Nombre de usuario</th>

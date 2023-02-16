@@ -85,24 +85,24 @@
             return $res;
         }
 
-        public function verificarCliente(string $dni){
+        public function verificarProveedor(string $ruc){
             $sql = "SELECT *
-            FROM clientes 
-            WHERE dni = '$dni'";
+            FROM proveedores 
+            WHERE ruc = '$ruc'";
             $data = $this->select($sql);
             return $data;
         }
 
-        public function registrarCliente(String $dni, string $nombre, string $telefono, string $direccion){
-            $this->dni = $dni;
+        public function registrarProveedor(String $ruc, string $nombre, string $telefono, string $direccion){
+            $this->ruc = $ruc;
             $this->nombre = $nombre;
             $this->telefono = $telefono;
             $this->direccion = $direccion;
-            $verificar = "SELECT * FROM clientes WHERE dni = '$this->dni'";
+            $verificar = "SELECT * FROM proveedores WHERE ruc = '$this->ruc'";
             $existe = $this->select($verificar);
             if(empty($existe)){
-                $sql = "INSERT INTO clientes(dni, nombre, telefono, direccion) VALUES (?,?,?,?)";
-                $datos = array($this->dni, $this->nombre, $this->telefono, $this->direccion);
+                $sql = "INSERT INTO proveedores(ruc, nombre, telefono, direccion) VALUES (?,?,?,?)";
+                $datos = array($this->ruc, $this->nombre, $this->telefono, $this->direccion);
                 $data = $this->save($sql, $datos);
                 if($data == 1){
                     $res = "ok";
@@ -115,9 +115,9 @@
             return $res;
         }
 
-        public function completarCompras(string $total, string $cliente, string $id_usario){
+        public function completarCompras(string $total, string $proveedor, string $id_usario){
             $sql = "CALL I_COMPRA(?, ?, ?)";
-            $datos = array($total, $cliente, $id_usario);
+            $datos = array($total, $proveedor, $id_usario);
             $data = $this->ejecutar($sql, $datos);
             
             return $data;
@@ -146,14 +146,14 @@
 
         public function getDetalleCompra(int $id_compra){
             
-            $sql = "SELECT compras.* , detalle_compras.* , productos.id AS id_d_productos , productos.descripcion , clientes.dni , clientes.nombre
+            $sql = "SELECT compras.* , detalle_compras.* , productos.id AS id_d_productos , productos.descripcion , proveedores.ruc , proveedores.nombre
             FROM compras
             INNER JOIN detalle_compras
             ON compras.id = detalle_compras.id_compra
             INNER JOIN productos
             ON detalle_compras.id_producto = productos.id
-            INNER JOIN clientes
-            ON compras.id_cliente = clientes.id
+            INNER JOIN proveedores
+            ON compras.id_proveedor = proveedores.id
             WHERE compras.id =  $id_compra";
             $data = $this->selectAll($sql);
             
@@ -161,9 +161,9 @@
         }
 
         public function gethistorialcompra(){
-            $sql = "SELECT compras.*, clientes.dni, clientes.nombre, usuarios.nombre AS nombre_usuario FROM compras
-            INNER JOIN clientes
-            ON clientes.id = compras.id_cliente
+            $sql = "SELECT compras.*, proveedores.ruc, proveedores.nombre, usuarios.nombre AS nombre_usuario FROM compras
+            INNER JOIN proveedores
+            ON proveedores.id = compras.id_proveedor
             INNER JOIN usuarios
             ON usuarios.id = compras.id_usuario
             ORDER BY compras.id DESC";

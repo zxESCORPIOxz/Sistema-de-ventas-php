@@ -41,23 +41,23 @@
             $telefono = $_POST['telefono'];
             $id = $_POST['id'];
             if( empty($dni) || empty($nombre) || empty($telefono)  || empty($direccion)){
-                $msj = "Todos los campos son obligatorios";
+                $msj = array('msj' => "Todos los campos son obligatorios", 'icono' => 'warning');
             }else{
                 if($id == ""){
                     $data = $this->model->registrarCliente($dni, $nombre, $telefono, $direccion);
                     if($data == "ok"){
-                        $msj = "si";
+                        $msj = array('msj' => "ok", 'icono' => 'success');
                     }else if($data == "existe"){
-                        $msj = "El DNI ya existe";
+                        $msj = array('msj' => "El DNI ya esta registrado", 'icono' => 'warning');
                     }else{
-                        $msj = "Error al registrar el cliente";
+                        $msj = array('msj' => "Error al registrar el cliente", 'icono' => 'warning');
                     }
                 }else{
                     $data = $this->model->modificarCliente($dni, $nombre, $telefono, $direccion, $id);
                     if($data == "modificado"){
-                        $msj = "modificado";
+                        $msj = array('msj' => "modificado", 'icono' => 'success');
                     }else{
-                        $msj = "Error al modificar el cliente";
+                        $msj = array('msj' => "Error al modificar el cliente", 'icono' => 'warning');
                     }
                 }
             }
@@ -72,9 +72,9 @@
         public function eliminar(int $id){
             $data = $this->model->accionCliente(0, $id);
             if ($data == 1){
-                $msj = "ok";
+                $msj = array('msj' => "ok", 'icono' => 'success');
             }else{
-                $msj = "Error no se pudo eliminar el Cliente"; 
+                $msj = array('msj' => "Error al eliminar el cliente", 'icono' => 'warning');
             }
             echo json_encode($msj, JSON_UNESCAPED_UNICODE);
             die();
@@ -82,9 +82,9 @@
         public function reingresar(int $id){
             $data = $this->model->accionCliente(1, $id);
             if ($data == 1){
-                $msj = "ok";
+                $msj = array('msj' => "ok", 'icono' => 'success');
             }else{
-                $msj = "Error no se pudo reingresar el Cliente"; 
+                $msj = array('msj' => "Error al reingresar el cliente", 'icono' => 'warning');
             }
             echo json_encode($msj, JSON_UNESCAPED_UNICODE);
             die();
