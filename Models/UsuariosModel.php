@@ -77,5 +77,19 @@
             $data = $this->save($sql, $datos);
             return $data;
         }
+
+        public function cambiarContraseña(String $usuario, string $clave){
+            $this->usuario = $usuario;
+            $this->clave = $clave;
+            $sql = "UPDATE usuarios SET clave = ? WHERE usuario = ?";
+            $datos = array($this->clave, $this->usuario);
+            $data = $this->save($sql, $datos);
+            if($data == 1){
+                $res = "ok";
+            }else{
+                $res = "error";
+            }
+            return $res;
+        }
     }
 ?>

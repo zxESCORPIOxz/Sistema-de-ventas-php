@@ -29,7 +29,7 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="userDropdown" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-                        <a class="dropdown-item" href="#">Perfil</a>
+                        <a class="dropdown-item" onclick="frmclave()"><i class="fas fa-key"></i> Cambiar contraseña</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="<?php echo base_url ?>Usuarios/salir">Cerrar sesión</a>
                     </div>
@@ -81,7 +81,18 @@
                             <div class="collapse" id="collapseLayouts2" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
                                 <nav class="sb-sidenav-menu-nested nav">
                                     <a class="nav-link" href="<?php echo base_url; ?>Compras"><i class="fas fa-shopping-cart fa-2x mr-2 text-primary"></i> Nueva compra</a>
-                                    <a class="nav-link" href="<?php echo base_url; ?>Compras/historial"><i class="fas fa-history fa-2x mr-2 text-primary"></i> Histotail de compras</a>
+                                    <a class="nav-link" href="<?php echo base_url; ?>Compras/historial"><i class="fas fa-list fa-2x mr-2 text-primary"></i> Histotail de compras</a>
+                                </nav>
+                            </div>
+                            <a class="nav-link collapsed" href="<?php echo base_url; ?>Usuarios" data-toggle="collapse" data-target="#collapseLayouts3" aria-expanded="false" aria-controls="collapseLayouts">
+                                <div class="sb-nav-link-icon"><i class="fas fa-money-bill-wave fa-2x mr-2 text-primary"></i></div>
+                                Ventas
+                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down text-primary"></i></div>
+                            </a>
+                            <div class="collapse" id="collapseLayouts3" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
+                                <nav class="sb-sidenav-menu-nested nav">
+                                    <a class="nav-link" href="<?php echo base_url; ?>Ventas"><i class="fas fa-shopping-cart fa-2x mr-2 text-primary"></i> Nueva Venta</a>
+                                    <a class="nav-link" href="<?php echo base_url; ?>Ventas/historial"><i class="fas fa-list fa-2x mr-2 text-primary"></i> Histotail de ventas</a>
                                 </nav>
                             </div>
                         </div>

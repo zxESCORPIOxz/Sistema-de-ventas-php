@@ -117,9 +117,41 @@
             echo json_encode($msj, JSON_UNESCAPED_UNICODE);
             die();
         }
+
         public function salir(){
             session_destroy();
             header('Location: '.base_url);
+        }
+
+        public function cambiarContraseña(){
+            $clave_actual = $_POST['clave_actual'];
+            $clave_nueva = $_POST['clave_nueva'];
+            $clave_confirmar = $_POST['clave_confirmar'];
+
+            if( empty($clave_actual) || empty($clave_nueva) || empty($clave_confirmar)){
+                $msj = array('msj' => "Todos los campos son obligatorios", 'icono' => 'warning');
+            }else{
+                $usuario = $_SESSION['usuario'];
+                $hash = hash("SHA256", $clave_actual);
+                $validar = $this->model->getUsuario($usuario,$hash);
+                if($validar){
+                    if($clave_nueva != $clave_confirmar){
+                        $msj = array('msj' => "Las contraseñas nuevas no coinciden", 'icono' => 'warning');
+                    }else{
+                        $hash_nuevo = hash("SHA256", $clave_nueva);
+                        $data = $this->model->cambiarContraseña($usuario, $hash_nuevo);
+                        if($data == "ok"){
+                            $msj = array('msj' => "ok", 'icono' => 'success');
+                        }else{
+                            $msj = array('msj' => "Error al cambiar la contraseña", 'icono' => 'warning');
+                        }
+                    }
+                }else{
+                    $msj = array('msj' => "Contraseña actual erronea", 'icono' => 'warning');
+                }
+            }
+            echo json_encode($msj, JSON_UNESCAPED_UNICODE);
+            die();
         }
     }
     

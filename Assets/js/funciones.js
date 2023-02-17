@@ -654,10 +654,129 @@ document.addEventListener("DOMContentLoaded",function(){
         ]
     } );
 
-    // Tabla historial
+    // Tabla historial compras
+
+    tblhistorialventa = $('#tblhistorialventa').DataTable( {
+        ajax: {
+            url: base_url + "Ventas/listarHistorial",
+            dataSrc: ''
+        },
+        columns: [
+        {
+            'data' : 'id'
+        },{
+            'data' : 'dni'
+        },{
+            'data' : 'nombre'
+        },{
+            'data' : 'total'
+        },{
+            'data' : 'fecha'
+        },{
+            'data' : 'nombre_usuario'
+        },{
+            'data' : 'acciones'
+        }],
+        language: {
+            "url": "//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json"
+        },
+        dom:"<'row'<'col-sm-4'l><'col-sm-4 text-center'B><'col-sm-4'f>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+        buttons: [{
+                //Botón para Excel
+                extend: 'excelHtml5',
+                footer: true,
+                title: 'Archivo',
+                filename: 'Export_File',
+ 
+                //Aquí es donde generas el botón personalizado
+                text: '<span class="badge badge-success"><i class="fas fa-file-excel"></i></span>'
+            },
+            //Botón para PDF
+            {
+                extend: 'pdfHtml5',
+                download: 'open',
+                footer: true,
+                title: 'Reporte ',
+                filename: 'Reporte ',
+                text: '<span class="badge  badge-danger"><i class="fas fa-file-pdf"></i></span>',
+                exportOptions: {
+                    columns: [0, ':visible']
+                }
+            },
+            //Botón para copiar
+            {
+                extend: 'copyHtml5',
+                footer: true,
+                title: 'Reporte ',
+                filename: 'Reporte ',
+                text: '<span class="badge  badge-primary"><i class="fas fa-copy"></i></span>',
+                exportOptions: {
+                    columns: [0, ':visible']
+                }
+            },
+            //Botón para print
+            {
+                extend: 'print',
+                footer: true,
+                filename: 'Export_File_print',
+                text: '<span class="badge badge-light"><i class="fas fa-print"></i></span>'
+            },
+            //Botón para cvs
+            {
+                extend: 'csvHtml5',
+                footer: true,
+                filename: 'Export_File_csv',
+                text: '<span class="badge  badge-success"><i class="fas fa-file-csv"></i></span>'
+            },
+            {
+                extend: 'colvis',
+                text: '<span class="badge  badge-info"><i class="fas fa-columns"></i></span>',
+                postfixButtons: ['colvisRestore']
+            }
+        ]
+    } );
+
+    // Tabla historial ventas
 
 
 });
+
+
+function frmclave(){
+    document.getElementById('frmclave').reset();
+
+    $("#cambio_contraseña").modal("show");
+}
+function cambiarContraseña(e){
+    
+    e.preventDefault();
+    const clave_actual = document.getElementById('clave_actual');
+    const clave_nueva = document.getElementById('clave_nueva');
+    const clave_confirmar = document.getElementById('clave_confirmar');
+    if(clave_actual.value == "" || clave_nueva.value == "" || clave_confirmar.value == ""){
+        mensajeEmergente('Todos los campos son obligatorios', 'warning');
+    }else{
+        const url = base_url + "Usuarios/cambiarContraseña";
+        const frm = document.getElementById("frmclave");
+        const http = new XMLHttpRequest();
+        http.open("POST", url, true);
+        http.send(new FormData(frm));
+        http.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                const res = JSON.parse(this.responseText);
+                if(res['msj'] == "ok"){
+                    mensajeEmergente('Contraseña modificada con exito', res['icono']);
+                    frm.reset();
+                    $("#cambio_contraseña").modal("hide");
+                }else{
+                    mensajeEmergente(res['msj'], res['icono']);
+                }
+            }
+        }
+    }
+}
 
 function frmusuario(){
     document.getElementById("title").innerHTML = "Nuevo Usuario";
@@ -679,7 +798,6 @@ function registrarUser(e) {
     const caja = document.getElementById('caja');
     if(usuario.value == ""  || nombre.value == ""){
         mensajeEmergente('Todos los campos son obligatorios', 'warning');
-          mensajeEmergente('Todos los campos son obligatorios', 'warning');
     }else{
         clave.classList.remove("is-invalid");
         usuario.classList.remove("is-invalid");
@@ -1884,6 +2002,199 @@ function cancelarCompra(){
 }
 
 // fun compras
+
+function buscarCodigoVenta(event) {
+    event.preventDefault();
+    if(event.which == 13){
+        const cod = document.getElementById("codigo").value;
+
+        const url = base_url + "Ventas/buscarCodigo/" + cod;
+        const http = new XMLHttpRequest();
+        http.open("GET", url, true);
+        http.send();
+        http.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                const res = JSON.parse(this.responseText);
+                if (res) {
+                    document.getElementById("nombre").value = res.descripcion;
+                    document.getElementById("precio").value = res.precio_venta;
+                    document.getElementById("id").value = res.id;
+                    document.getElementById("cantidad").focus();
+
+                    cargardetalle();
+                } else {
+                    mensajeEmergente('El producto no existe', 'warning');
+                    document.getElementById("codigo").value = '';
+                    document.getElementById("codigo").focus();
+
+                    cargardetalle();
+                }
+            }
+        }
+    }
+}
+
+function calcularSubtotalVenta(event){
+    event.preventDefault();
+    const cant = document.getElementById("cantidad").value;
+    const precio = document.getElementById("precio").value;
+    document.getElementById("sub_total").value = cant * precio;
+    if( event.which == 13){
+        if( cant > 0 ){
+            const url = base_url + "Ventas/ingresar";
+            const frm = document.getElementById("frmventa");
+            const http = new XMLHttpRequest();
+            http.open("POST", url, true);
+            http.send(new FormData(frm));
+            http.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+                    const res = JSON.parse(this.responseText);
+                    if(res['msj'] == "ok"){
+                        frm.reset();
+                        cargardetalle();
+                        document.getElementById("codigo").focus();
+                    }else{
+                        mensajeEmergente(res['msj'], res['icono']);
+                    }
+
+                    cargardetalle();
+                }
+            }
+        }
+    }
+}
+
+function frmclientevalidar(dni){
+    document.getElementById("title").innerHTML = "Nuevo cliente";
+    document.getElementById("btnAccion").innerHTML = "Registrar";
+
+    document.getElementById('frmcliente').reset();
+
+    document.getElementById('dni').value = dni;
+
+    $("#nuevo_cliente").modal("show");
+    document.getElementById('id').value = "";
+}
+
+function verificarCliente(e) {
+    e.preventDefault();
+    const dni = document.getElementById("cliente").value;
+
+    const url = base_url + "Ventas/verificarCliente/" + dni;
+    const http = new XMLHttpRequest();
+    http.open("GET", url, true);
+    http.send();
+    http.onreadystatechange = function(){
+        if(this.readyState == 4 && this.status == 200){
+            const res = JSON.parse(this.responseText);
+            if (res['msj'] == "ok") {
+                mensajeEmergente('El cliente fue validado correctamente', res['icono']);
+                document.getElementById("estadocliente").value =  document.getElementById("cliente").value;
+            } else if(res == "inactivo"){
+                mensajeEmergente('El cliente esta betado de la tienda', res['icono']);
+                document.getElementById("estadocliente").value = "inactivo";
+            } else {
+                document.getElementById("estadocliente").value = "inactivo";
+                frmclientevalidar(dni);
+            }
+
+            cargardetalle();
+        }
+    }
+}
+
+function registrarClienteVenta(e) {
+    e.preventDefault();
+    const dni = document.getElementById('dni');
+    const nombre = document.getElementById('nombre_cliente');
+    const telefono = document.getElementById('telefono');
+    const direccion = document.getElementById('direccion');
+    if(dni.value == ""  || nombre.value == "" || telefono.value == "" || direccion.value == ""){
+        mensajeEmergente('Todos los campos son obligatorios', 'warning');
+    }else{
+        const url = base_url + "Ventas/registrarCliente";
+        const frm = document.getElementById("frmcliente");
+        const http = new XMLHttpRequest();
+        http.open("POST", url, true);
+        http.send(new FormData(frm));
+        http.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                console.log(this.responseText);
+                const res = JSON.parse(this.responseText);
+                if(res['msj'] == "ok"){
+                    mensajeEmergente('Cliente registrado con exito', res['icono']);
+                    frm.reset();
+                    $("#nuevo_cliente").modal("hide");          
+                    document.getElementById("estadocliente").value =  document.getElementById("cliente").value;
+                }else{
+                    
+                    mensajeEmergente(res['msj'], res['icono']);
+                }
+            }
+        }
+
+        cargardetalle();
+    }
+    
+}
+
+function completarVentas(e) {
+    e.preventDefault();
+    const cliente = document.getElementById("estadocliente").value;
+    if (cliente != 'inactivo') {
+        const url = base_url + "Ventas/completarVentas/" + cliente;
+        const http = new XMLHttpRequest();
+        http.open("POST", url, true);
+        http.send();
+        http.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                console.log(this.responseText);
+                const res = JSON.parse(this.responseText);
+                if(res['msj']=='ok'){
+                    mensajeEmergente('Venta registrada con exito', res['icono']);
+                    cargardetalle(); 
+                    document.getElementById("estadocliente").value = 'inactivo';  
+                    document.getElementById("cliente").value = ''; 
+                    const ruta = base_url + 'Ventas/generarPDF/' + res['id_venta'];
+                    window.open(ruta);
+                    setTimeout(() => {
+                    window.location.reload();
+                    }, 300
+                    );
+                }else{
+                    mensajeEmergente(res['msj'], res['icono']);
+                }
+            }
+        }
+    } else {
+        mensajeEmergente('Ingrese el cliente primero', 'warning');
+    }
+
+    cargardetalle();
+}
+
+function cancelarVenta(){
+    const url = base_url + "Ventas/cancelarVenta";
+    const http = new XMLHttpRequest();
+    http.open("GET", url, true);
+    http.send();
+    http.onreadystatechange = function(){
+        if(this.readyState == 4 && this.status == 200){
+            const res = JSON.parse(this.responseText);
+            if (res['msj'] == "ok"){
+                cargardetalle();
+                document.getElementById("estadocliente").value = 'inactivo';  
+                document.getElementById("cliente").value = ''; 
+            }else{
+                mensajeEmergente(res['msj'], res['icono']);
+            }
+        }
+    }
+
+    cargardetalle();
+}
+
+// fun ventas
 
 function modificarEmpresa(){
     const url = base_url + "Administracion/modificarEmpresa";
