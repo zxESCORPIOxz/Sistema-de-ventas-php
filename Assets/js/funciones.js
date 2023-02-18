@@ -777,7 +777,6 @@ function cambiarContraseña(e){
         }
     }
 }
-
 function frmusuario(){
     document.getElementById("title").innerHTML = "Nuevo Usuario";
     document.getElementById("btnAccion").innerHTML = "Registrar";
@@ -2204,7 +2203,6 @@ function modificarEmpresa(){
     http.send(new FormData(frm));
     http.onreadystatechange = function(){
         if(this.readyState == 4 && this.status == 200){
-            console.log(this.responseText);
             const res = JSON.parse(this.responseText);
             if(res['msj'] == "modificado"){
                 mensajeEmergente('Datos modificados con exito', res['icono']);
@@ -2228,3 +2226,74 @@ function mensajeEmergente(mensaje, icono){
 }
 
 // fun utiles
+
+function reporteStockMinimo(){
+    const url = base_url + "Administracion/reporteStockMinimo";
+    const http = new XMLHttpRequest();
+    http.open("POST", url, true);
+    http.send();
+    http.onreadystatechange = function(){
+        if(this.readyState == 4 && this.status == 200){
+            const res = JSON.parse(this.responseText);
+            let nombres = [];
+            let cantidades = [];
+            for(let i = 0; i < res.length; i++){
+                nombres.push(res[i]['descripcion']);
+                cantidades.push(res[i]['cantidad']);
+            }
+
+            var ctx = document.getElementById("Stock_minimo");
+            var myPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: nombres,
+                datasets: [{
+                data: cantidades,
+                backgroundColor: ['#003049', '#d62828', '#f77f00', '#fcbf49', '#eae2b7', 
+                '#dad7cd', '#a3b18a', '#588157', '#3a5a40', '#344e41'],
+                }],
+            },
+            });
+        }
+    }
+}
+function reporteProductosVendidos(){
+    const url = base_url + "Administracion/reporteProductosVendidos";
+    const http = new XMLHttpRequest();
+    http.open("POST", url, true);
+    http.send();
+    http.onreadystatechange = function(){
+        if(this.readyState == 4 && this.status == 200){
+            const res = JSON.parse(this.responseText);
+            let nombres = [];
+            let cantidades = [];
+            for(let i = 0; i < res.length; i++){
+                nombres.push(res[i]['descripcion']);
+                cantidades.push(res[i]['cantidadTotal']);
+            }
+
+            var ctx = document.getElementById("Productos_vendidos");
+            var myPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: nombres,
+                datasets: [{
+                data: cantidades,
+                backgroundColor: ['#003049', '#d62828', '#f77f00', '#fcbf49', '#eae2b7', 
+                                '#dad7cd', '#a3b18a', '#588157', '#3a5a40', '#344e41'],
+                }],
+            },
+            });
+        }
+    }
+}
+
+if(document.getElementById('Stock_minimo')){
+    reporteStockMinimo();
+}
+
+if(document.getElementById('Productos_vendidos')){
+    reporteProductosVendidos();
+}
+
+// Pie Chart

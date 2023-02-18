@@ -13,6 +13,15 @@
             $this->views->getView($this, "index", $data);
         }
 
+        public function home(){
+            $data['usuarios'] = $this->model->getDataAdmin('usuarios');
+            $data['clientes'] = $this->model->getDataAdmin('clientes');
+            $data['proveedores'] = $this->model->getDataAdmin('proveedores');
+            $data['productos'] = $this->model->getDataAdmin('productos');
+            $data['ventasdia'] = $this->model->getDataAdminAvg();
+            $this->views->getView($this, "home", $data);
+        }
+
         public function modificarEmpresa() {
             $id = $_POST['id'];
             $nombre = $_POST['nombre'];
@@ -36,6 +45,20 @@
                 }
             }
             echo json_encode($res, JSON_UNESCAPED_UNICODE);
+            die();
+        }
+
+        public function reporteStockMinimo(){
+            $data = $this->model->reporteStockMinimo();
+            
+            echo json_encode($data, JSON_UNESCAPED_UNICODE);
+            die();
+        }
+
+        public function reporteProductosVendidos(){
+            $data = $this->model->reporteProductosVendidos();
+            
+            echo json_encode($data, JSON_UNESCAPED_UNICODE);
             die();
         }
     }

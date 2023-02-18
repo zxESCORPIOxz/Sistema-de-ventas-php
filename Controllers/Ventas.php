@@ -24,20 +24,24 @@
             $cantidad = $_POST['cantidad'];
             $subtotal = $precio * $cantidad;
             $validar = $this->model->validarProducto($id_producto, $id_usuario);
-            if (empty($validar)) {
-                $data = $this->model->registrarDetalle($id_producto, $id_usuario, $precio, $cantidad, $subtotal);
-            } else {
-                $cantidad = $validar['cantidad'] + $cantidad;
-                $subtotal = $precio * $cantidad;
-                $id_detalle = $validar['id'];
-                $data = $this->model->modificarDetalle($cantidad, $subtotal, $id_detalle);
-            }
-            if ($data == "ok") {
-                $msj = array('msj' => "ok", 'icono' => 'success');
-            } else if($data == "stock"){
-                $msj = array('msj' => "Error al ingresar el stock", 'icono' => 'warning');
+            if($cantidad < $datos['cantidad']){
+                if (empty($validar)) {
+                    $data = $this->model->registrarDetalle($id_producto, $id_usuario, $precio, $cantidad, $subtotal);
+                } else {
+                    $cantidad = $validar['cantidad'] + $cantidad;
+                    $subtotal = $precio * $cantidad;
+                    $id_detalle = $validar['id'];
+                    $data = $this->model->modificarDetalle($cantidad, $subtotal, $id_detalle);
+                }
+                if ($data == "ok") {
+                    $msj = array('msj' => "ok", 'icono' => 'success');
+                } else if($data == "stock"){
+                    $msj = array('msj' => "Error al ingresar el stock", 'icono' => 'warning');
+                }else{
+                    $msj = array('msj' => "Error al ingresar el producto", 'icono' => 'warning');
+                }
             }else{
-                $msj = array('msj' => "Error al ingresar el producto", 'icono' => 'warning');
+                $msj = array('msj' => "No se cuenta con la cantidad solicitada", 'icono' => 'warning');
             }
             echo json_encode($msj, JSON_UNESCAPED_UNICODE);
             die();

@@ -41,6 +41,10 @@
                 <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
                     <div class="sb-sidenav-menu">
                         <div class="nav">
+                            <a class="nav-link" href="<?php echo base_url; ?>Administracion/home">
+                                <div class="sb-nav-link-icon"><i class="fas fa-home fa-2x mr-2 text-primary"></i></div>
+                                Inicio
+                            </a>
                             <a class="nav-link collapsed" href="<?php echo base_url; ?>Usuarios" data-toggle="collapse" data-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
                                 <div class="sb-nav-link-icon"><i class="fas fa-cogs fa-2x mr-2 text-primary"></i></div>
                                 Administración
